@@ -17,7 +17,7 @@ ScaleRecoderController.prototype.start = function(onData, onError, onOpen){
             console.error('  1. 您的 COM_PORT 名稱是否正確？');
             console.error('  2. 您的 USB-to-RS232 轉接器是否已插入？');
             console.error('  3. 磅秤是否已開啟？');
-            onError("[!] 錯誤: 無法開啟連接埠: ${err.message}")
+            onError(`[!] 錯誤: 無法開啟連接埠: ${err.message}`)
             return;
         }
     });
