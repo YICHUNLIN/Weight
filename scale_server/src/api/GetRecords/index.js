@@ -10,6 +10,11 @@ module.exports = function(context){
     return [
         (req, res) => {
             const d = fs.readdirSync(path)
+                .filter(date => {
+                    if (req.query.date && date.includes(req.query.date)) return true;
+                    if (req.query.date && !date.includes(req.query.date)) return false;
+                    return true;
+                })
                 .reduce((map, date) => {
                     const p = `${path}/${date}`
                     const d = fs.readdirSync(p)

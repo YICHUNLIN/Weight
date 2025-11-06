@@ -59,18 +59,24 @@ module.exports = function(context){
                     ScaleRecoderController.start(d => {
                         chunk = [...chunk,d]
                     }, error => {
-                        fs.writeFileSync(`${p}/${time.getTime()}.json`, JSON.stringify({
-                            ...data,
-                            message: error
-                        }))
+                        fs.writeFileSync(`${p}/${time.getTime()}.json`, JSON.stringify([
+                            {
+                                ...data,
+                                message: error
+                            }
+                        ]))
                         reject(`${error}, 地磅資訊未取得,有成功儲存輸入資訊`);
                     }, 
                     () => {
                         setTimeout(() => {
                             ScaleRecoderController.close();
-                            fs.writeFileSync(`${p}/${time.getTime()}.json`, JSON.stringify({
-                                ...data,chunk
-                            }))
+                            fs.writeFileSync(`${p}/${time.getTime()}.json`, JSON.stringify(
+                                [
+                                    {
+                                        ...data,chunk
+                                    }
+                                ]
+                            ))
                             resolve(chunk)
                         }, 3 * 1000)
                     });
