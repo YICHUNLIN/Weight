@@ -1,15 +1,9 @@
-const fs = require('fs');
-const path = `${process.cwd()}/data`;
-const {TimeManager, Job} = require('../../utils/TimeMamager');
-// 避免同時開port的問題
-const mamager = new TimeManager("[SCALE PROCESS]");
-mamager.start()
 /**
  * @description 新增過磅紀錄
  */
 module.exports = function(context){
-    const {ScaleRecoderController} = context.controller;
-    const {} = context.models;
+    const {} = context.controller;
+    const {Record, Scale} = context.models;
     return [
         (req, res, next) => {
             // 貨物名稱
@@ -45,47 +39,20 @@ module.exports = function(context){
             return next();
         },
         (req, res) => {
-            const time = new Date();
-            const date = time.toISOString().split('T')[0];
-            const content = () => {
-                return new Promise((resolve, reject) => {
-                    let chunk = [];
-                    const time = new Date();
-                    const date = time.toISOString().split('T')[0];
-                    const p = `${path}/${date}`;
-                    if (!fs.existsSync(p))
-                        fs.mkdirSync(p)
-                    const data = {id: time.getTime(),...req.body, createdAt: time}
-                    ScaleRecoderController.start(d => {
-                        chunk = [...chunk,d]
-                    }, error => {
-                        fs.writeFileSync(`${p}/${time.getTime()}.json`, JSON.stringify([
-                            {
-                                ...data,
-                                message: error
-                            }
-                        ]))
-                        reject(`${error}, 地磅資訊未取得,有成功儲存輸入資訊`);
-                    }, 
-                    () => {
-                        setTimeout(() => {
-                            ScaleRecoderController.close();
-                            fs.writeFileSync(`${p}/${time.getTime()}.json`, JSON.stringify(
-                                [
-                                    {
-                                        ...data,chunk
-                                    }
-                                ]
-                            ))
-                            resolve(chunk)
-                        }, 3 * 1000)
-                    });
+            delete req.body.tags;
+            delete req.body.id;
+            Scale.getData()
+                .then(r => {
+                    const data = {...req.body, chunk:r}
+                    Record.create(data)
+                        .then(r => res.status(200).json({code: 200, data: r}))
+                        .catch(err => res.status(400).json({code: 400, err}))
                 })
-            }
-            const onStart = (name) => console.log(`${name} start exec...`)
-            const onError = (name, t, err) => res.status(400).json({code: 400, err, name, t})
-            const onDone = (name, t, e) => res.status(200).json({code: 200, e, name, t})
-            mamager.addJob(new Job(`ON SCALE RECORD ${date} ${time.getTime()}`,content,onStart,onDone,onError))
+                .catch(err => {
+                    Record.create(req.body)
+                        .then(r => res.status(200).json({code: 200, data: r, message: err}))
+                        .catch(e => res.status(400).json({code: 400, e}))
+                })
         }
     ]
 };

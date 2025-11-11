@@ -1,0 +1,8 @@
+{
+    "name":"/record/:date/:id/undo",
+    "method": "delete",
+    "auth": false,
+    "pms":[],
+    "desc": "取消刪除過磅紀錄",
+    "index": "index.js"
+}
