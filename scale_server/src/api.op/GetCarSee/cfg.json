@@ -1,8 +1,0 @@
-{
-    "name":"/carsee",
-    "method": "get",
-    "auth": false,
-    "pms":[],
-    "desc": "取得使用者們可以看到的車子",
-    "index": "index.js"
-}
