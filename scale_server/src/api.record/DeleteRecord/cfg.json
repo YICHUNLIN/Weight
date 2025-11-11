@@ -1,0 +1,8 @@
+{
+    "name":"/:date/:id",
+    "method": "delete",
+    "auth": false,
+    "pms":[],
+    "desc": "刪除過磅紀錄",
+    "index": "index.js"
+}

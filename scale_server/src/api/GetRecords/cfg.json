@@ -1,8 +1,0 @@
-{
-    "name":"/record",
-    "method": "get",
-    "auth": false,
-    "pms":[],
-    "desc": "取得過磅紀錄?date=",
-    "index": "index.js"
-}

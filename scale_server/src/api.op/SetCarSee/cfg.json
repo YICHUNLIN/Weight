@@ -1,0 +1,8 @@
+{
+    "name":"/carsee/:car/:user",
+    "method": "post",
+    "auth": false,
+    "pms":[],
+    "desc": "設定使用者可以看到的車子",
+    "index": "index.js"
+}

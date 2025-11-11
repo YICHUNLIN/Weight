@@ -26,6 +26,33 @@ Record.prototype.create = function(data){
 }
 
 /**
+ * @description 根據車號及日期取得資料
+ * @param {*} car 
+ * @param {*} targetDate 
+ * @returns 
+ */
+Record.prototype.findByCarAndDate = function(car,targetDate){
+    return new Promise((resolve, reject) => {
+        const result = fs.readdirSync(this.path)
+            .filter(date => date === targetDate)
+            .reduce((map, date) => {
+                const p = `${this.path}/${date}`
+                const data = fs.readdirSync(p)
+                    .map(file => JSON.parse(fs.readFileSync(`${p}/${file}`)))
+                    .filter(d => {
+                        const last = d[d.length - 1];
+                        if (!last.hasOwnProperty("tags")) return true;
+                        if (last.tags.includes("delete")) return false;
+                        if(last.car === car) return true;
+                        return false;
+                    });
+                return {...map, [date]: data}
+            }, {})
+        resolve(result)
+    })
+}
+
+/**
  * @description 搜尋
  * @param {*} query ?data=&tags=A,B,C
  * @returns 

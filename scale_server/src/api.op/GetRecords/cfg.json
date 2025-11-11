@@ -1,0 +1,8 @@
+{
+    "name":"/records",
+    "method": "get",
+    "auth": false,
+    "pms":[],
+    "desc": "取得某車子的過磅紀錄?date=&car=",
+    "index": "index.js"
+}

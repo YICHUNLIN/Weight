@@ -1,8 +1,0 @@
-{
-    "name":"/record/:date/:id",
-    "method": "patch",
-    "auth": false,
-    "pms":[],
-    "desc": "更新過磅紀錄",
-    "index": "index.js"
-}

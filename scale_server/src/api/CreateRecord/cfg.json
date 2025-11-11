@@ -1,8 +1,0 @@
-{
-    "name":"/record",
-    "method": "post",
-    "auth": false,
-    "pms":[],
-    "desc": "新增過磅紀錄",
-    "index": "index.js"
-}
