@@ -41,6 +41,7 @@ module.exports = function(context){
         (req, res) => {
             delete req.body.tags;
             delete req.body.id;
+            req.body.createdBy = req.loginState.id;
             Scale.getData()
                 .then(r => {
                     const data = {...req.body, chunk:r}

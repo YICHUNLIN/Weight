@@ -1,8 +1,8 @@
 {
     "name":"/",
     "method": "get",
-    "auth": false,
-    "pms":[],
+    "auth": true,
+    "pms":["SCALE_USE_LOCAL_CLIENT"],
     "desc": "取得過磅紀錄?date=",
     "index": "index.js"
 }

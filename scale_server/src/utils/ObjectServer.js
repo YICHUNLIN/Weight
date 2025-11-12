@@ -13,7 +13,7 @@ function ObjectServer(options){
     this.url = options.url;
     this.getSelfTicket()
             .then(r => {
-                this.ticket = r.ticket
+                this.ticket = r.ticket;
                 this.getTicketInterval(60 * 60 * 1000);
             })
             .catch(console.log)

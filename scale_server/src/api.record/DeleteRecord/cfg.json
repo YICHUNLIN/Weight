@@ -1,8 +1,8 @@
 {
     "name":"/:date/:id",
     "method": "delete",
-    "auth": false,
-    "pms":[],
+    "auth": true,
+    "pms":["SCALE_CREATE_RECORD"],
     "desc": "刪除過磅紀錄",
     "index": "index.js"
 }

@@ -7,6 +7,8 @@ module.exports = function(context){
     return [
         (req, res) => {
             const {date, id} = req.params;
+            if(!Record.checkOwner(date, id, req.loginState.id))
+                return res.status(400).json({code: 400, messagr: 'The record not yours.'})
             Record.delete(date, id)
                 .then(d => res.status(200).json({code: 200, data: d}))
                 .catch(err => res.status(400).json({code: 400, err}))

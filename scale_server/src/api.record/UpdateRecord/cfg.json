@@ -1,8 +1,8 @@
 {
     "name":"/:date/:id",
     "method": "patch",
-    "auth": false,
-    "pms":[],
+    "auth": true,
+    "pms":["SCALE_CREATE_RECORD"],
     "desc": "更新過磅紀錄",
     "index": "index.js"
 }

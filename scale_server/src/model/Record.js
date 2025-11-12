@@ -8,6 +8,20 @@ function Record(context){
 }
 
 /**
+ * @description 確認Record是不是某使用者的,只有Owner能夠更改自己
+ * @param {*} date 
+ * @param {*} id 
+ * @param {*} userId 
+ */
+Record.prototype.checkOwner = function(date, id, userId){
+    const file = `${this.path}/${date}/${id}.json`;
+    if (!fs.existsSync(file)) return false
+    const data = JSON.parse(fs.readFileSync(file));
+    const last = data[data.length - 1];
+    return last.createdBy === userId;
+}
+
+/**
  * @description 新增
  * @param {*} data 
  * @returns 
@@ -54,7 +68,7 @@ Record.prototype.findByCarAndDate = function(car,targetDate){
 
 /**
  * @description 搜尋
- * @param {*} query ?data=&tags=A,B,C
+ * @param {*} query ?date=&tags=A,B,C
  * @returns 
  */
 Record.prototype.find = function(query){

@@ -1,8 +1,8 @@
 {
     "name":"/",
     "method": "post",
-    "auth": false,
-    "pms":[],
+    "auth": true,
+    "pms":["SCALE_CREATE_RECORD"],
     "desc": "新增過磅紀錄",
     "index": "index.js"
 }
