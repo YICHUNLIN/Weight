@@ -11,15 +11,14 @@ import { AppContext, Provider } from './storage/context';
 import { useContext } from 'react';
 
 function App() {
-  const [state, dispatch] = useContext(AppContext)
-
+  const [{auth:{isAuth}}, dispatch] = useContext(AppContext)
   const onSignInSuccess = (info) => {
     dispatch({type: 'SAVE_USER', payload: info})
   }
 
   return <div>
     {
-        (state.auth.isAuth === false) ? <SignIn onSuccess={onSignInSuccess}/> :<AppProvider/>
+        (isAuth === false) ? <SignIn onSuccess={onSignInSuccess}/> :<AppProvider/>
     }
   </div>
 }

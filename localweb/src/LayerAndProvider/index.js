@@ -31,7 +31,8 @@ function AppProviderBasic({ window, ...others }) {
     },
   });
   useEffect(() => {
-    setSession({...session, user: {name: state.auth?.user?.name}})
+    const {auth} = state;
+    setSession({...session, user: {name: auth.user?.name, email: auth.user?.email}})
   }, [state.auth])
   const authentication = React.useMemo(() => {
     return {

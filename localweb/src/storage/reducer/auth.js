@@ -11,7 +11,11 @@ export default (state = initState, action) => {
             localStorage.removeItem("user")
             localStorage.removeItem("ticket")
             localStorage.removeItem("isAuth")
-            return initState;
+            return {
+                user: null,
+                ticket: null,
+                isAuth: false
+            }
         case "SAVE_USER":
             localStorage.setItem('user', JSON.stringify(payload.user));
             localStorage.setItem('ticket', payload.ticket)
