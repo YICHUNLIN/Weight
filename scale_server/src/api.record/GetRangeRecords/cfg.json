@@ -1,0 +1,8 @@
+{
+    "name":"/range",
+    "method": "get",
+    "auth": true,
+    "pms":["SCALE_USE_LOCAL_CLIENT"],
+    "desc": "取得時間區段的過磅紀錄?start=&end=",
+    "index": "index.js"
+}

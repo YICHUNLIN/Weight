@@ -7,14 +7,14 @@ module.exports = function(context){
     return [
         (req, res, next) => {
             // 貨物名稱
-            if (!req.body.hasOwnProperty('createdBy')) 
-                return res.status(400).json({code: 400, message: 'createdBy must be requuired in body.'});
-            // 貨物名稱
             if (!req.body.hasOwnProperty('item')) 
                 return res.status(400).json({code: 400, message: 'item must be requuired in body.'});
             // 進或出
             if (!req.body.hasOwnProperty('inorout')) 
                 return res.status(400).json({code: 400, message: 'inorout must be requuired in body.'});
+            // 客戶
+            if (!req.body.hasOwnProperty('client')) 
+                return res.status(400).json({code: 400, message: 'client must be requuired in body.'});
             // 目的地或來源
             if (!req.body.hasOwnProperty('source_or_destination')) 
                 return res.status(400).json({code: 400, message: 'source_or_destination must be requuired in body.'});

@@ -1,6 +1,7 @@
 import React, { createContext, useReducer} from 'react';
 import {reducers} from './reducer'
 import { useState } from 'react';
+import { useContext } from 'react';
 const AppContext = createContext({});
 const initState = reducers()
 const Provider = ({children}) => {
@@ -10,4 +11,16 @@ const Provider = ({children}) => {
     </AppContext.Provider>
 }
 
-export {AppContext, Provider};
+const connect = (stateMap, funcMap) => (node) =>{
+    const [state, dispatch] = useContext(AppContext);
+    const mapFunc = Object.keys(funcMap).reduce((map, key) => {
+        return {...map, [key]: funcMap[key](dispatch)}
+    }, {})
+    return React.cloneElement(node,{...stateMap(state), ...mapFunc})
+}
+
+
+const useGlobalContext = () => {
+    return useContext(AppContext);
+}
+export {AppContext, Provider, connect, useGlobalContext};

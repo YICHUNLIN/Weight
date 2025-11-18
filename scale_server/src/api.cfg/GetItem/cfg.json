@@ -1,0 +1,8 @@
+{
+    "name":"/items",
+    "method": "get",
+    "auth": true,
+    "pms":["SCALE_USE"],
+    "desc": "取得貨物種類",
+    "index": "index.js"
+}

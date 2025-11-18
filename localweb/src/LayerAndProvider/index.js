@@ -4,26 +4,28 @@ import { AppProvider } from '@toolpad/core/AppProvider'
 // import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { useDemoRouter } from '@toolpad/core/internal';
-import NAVIGATION from './navigation';
+import GetNav from './navigation';
 import DefaultTheme from './theme'
 import Router from './route';
 import { AppContext } from '../storage/context';
 import { useContext } from 'react';
 import { useEffect } from 'react';
-const BRANDING = {
-  logo: (
-    <img
-      src="https://mui.com/static/logo.svg"
-      alt="MUI logo"
-      style={{ height: 24 }}
-    />
-  ),
-  title: '金三榮地磅',
-};
-
+import jungIcon from '../asserts/JA-192x192.png'
+import { GetAppName } from '../action/cfg';
+import { useState } from 'react';
 
 function AppProviderBasic({ window, ...others }) {
-  const [state, dispatch] = useContext(AppContext)
+  const [BRANDING, setBRANDING] = useState({
+    logo: (
+      <img
+        src={jungIcon}
+        alt="Jung"
+        style={{ height: 24 }}
+      />
+    ),
+    title: '金三榮地磅',
+  })
+  const [state, dispatch] = useContext(AppContext);
   const [session, setSession] = React.useState({
     user: {
       name: '',
@@ -33,6 +35,9 @@ function AppProviderBasic({ window, ...others }) {
   useEffect(() => {
     const {auth} = state;
     setSession({...session, user: {name: auth.user?.name, email: auth.user?.email}})
+    GetAppName()
+      .then(name => setBRANDING({...BRANDING, title: name}))
+      .catch(console.log)
   }, [state.auth])
   const authentication = React.useMemo(() => {
     return {
@@ -51,7 +56,7 @@ function AppProviderBasic({ window, ...others }) {
   return (
     <AppProvider
         session={session}
-        navigation={NAVIGATION}
+        navigation={GetNav(state.auth.user.permissions.map(p => p.name))}
         branding={BRANDING}
         router={router}
         theme={DefaultTheme}
@@ -59,7 +64,7 @@ function AppProviderBasic({ window, ...others }) {
         authentication={authentication}
       >
         <DashboardLayout>
-          <Router pathname={router.pathname} message={`Test 12345 ${router.pathname}`} {...others} />
+          <Router pathname={router.pathname}  {...others} />
         </DashboardLayout>
       </AppProvider>
   );

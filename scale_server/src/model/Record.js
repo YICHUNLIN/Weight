@@ -14,7 +14,7 @@ function Record(context){
  * @param {*} userId 
  */
 Record.prototype.checkOwner = function(date, id, userId){
-    const file = `${this.path}/${date}/${id}.json`;
+    const file = `${this.path}/${date}/${id}/metadata.json`;
     if (!fs.existsSync(file)) return false
     const data = JSON.parse(fs.readFileSync(file));
     const last = data[data.length - 1];
@@ -34,7 +34,8 @@ Record.prototype.create = function(data){
         if (!fs.existsSync(p))
             fs.mkdirSync(p)
         const d = {id: time.getTime(),...data, createdAt: time};
-        fs.writeFileSync(`${p}/${d.id}.json`, JSON.stringify([d]))
+        fs.mkdirSync(`${p}/${d.id}`)
+        fs.writeFileSync(`${p}/${d.id}/metadata.json`, JSON.stringify([d]))
         return resolve();
     })
 }
@@ -52,7 +53,7 @@ Record.prototype.findByCarAndDate = function(car,targetDate){
             .reduce((map, date) => {
                 const p = `${this.path}/${date}`
                 const data = fs.readdirSync(p)
-                    .map(file => JSON.parse(fs.readFileSync(`${p}/${file}`)))
+                    .map(dir => JSON.parse(fs.readFileSync(`${p}/${dir}/metadata.json`)))
                     .filter(d => {
                         const last = d[d.length - 1];
                         if (!last.hasOwnProperty("tags")) return true;
@@ -67,8 +68,8 @@ Record.prototype.findByCarAndDate = function(car,targetDate){
 }
 
 /**
- * @description 搜尋
- * @param {*} query ?date=&tags=A,B,C
+ * @description 搜尋 不包含Delete資料
+ * @param {*} query ?date=
  * @returns 
  */
 Record.prototype.find = function(query){
@@ -82,17 +83,65 @@ Record.prototype.find = function(query){
             .reduce((map, date) => {
                 const p = `${this.path}/${date}`
                 const d = fs.readdirSync(p)
-                    .filter(file => {
-                        if (query.hasOwnProperty("tags") && query.tags.includes("delete")){
-                            const d = JSON.parse(fs.readFileSync(`${p}/${file}`));
-                            const last = d[d.length - 1];
-                            if (!last.hasOwnProperty("tags")) return false;
-                            if (!last.tags.includes("delete")) 
-                                 return false;
-                        }
+                    .map(file => JSON.parse(fs.readFileSync(`${p}/${file}/metadata.json`)))
+                    .filter(d => {
+                        const last = d[d.length - 1];
+                        if (last.hasOwnProperty("tags") && last.tags.includes("delete")) 
+                            return false;
                         return true;
                     })
-                    .map(file => JSON.parse(fs.readFileSync(`${p}/${file}`)));
+                return {...map, [date]: d}
+            }, {})
+        resolve(result)
+    })
+}
+
+
+/**
+ * @description 根據 range 找資料,不含deleted
+ * @param {*} range array of date
+ * @returns 
+ */
+Record.prototype.findByRange = function(range){
+    return new Promise((resolve, reject) => {
+        const result = fs.readdirSync(this.path)
+            .filter(date => range.includes(date))
+            .reduce((map, date) => {
+                const p = `${this.path}/${date}`
+                const d = fs.readdirSync(p)
+                    .map(file => JSON.parse(fs.readFileSync(`${p}/${file}/metadata.json`)))
+                    .filter(d => {
+                        const last = d[d.length - 1];
+                        if (last.hasOwnProperty("tags") && last.tags.includes("delete")) 
+                            return false;
+                        return true;
+                    })
+                    .map(d => d[d.length-1])
+                return {...map, [date]: d}
+            }, {})
+        resolve(result)
+    })
+}
+
+
+/**
+ * @description 取得被刪除的資料
+ * @param {*} query ?date=
+ * @returns 
+ */
+Record.prototype.findDeleted = function(){
+    return new Promise((resolve, reject) => {
+        const result = fs.readdirSync(this.path)
+            .reduce((map, date) => {
+                const p = `${this.path}/${date}`
+                const d = fs.readdirSync(p)
+                    .map(file => JSON.parse(fs.readFileSync(`${p}/${file}/metadata.json`)))
+                    .filter(d => {
+                        const last = d[d.length - 1];
+                        if (last.hasOwnProperty("tags") && last.tags.includes("delete")) 
+                            return true;
+                        return false;
+                    })
                 return {...map, [date]: d}
             }, {})
         resolve(result)
@@ -107,11 +156,11 @@ Record.prototype.find = function(query){
  */
 Record.prototype.delete = function(date, id){
     return new Promise((resolve, reject) => {
-        const file = `${this.path}/${date}/${id}.json`;
+        const file = `${this.path}/${date}/${id}/metadata.json`;
         if (!fs.existsSync(file))
             return reject({message: 'not found file'});
         const data = JSON.parse(fs.readFileSync(file));
-        let last = data[data.length - 1];
+        let last = {...data[data.length - 1]};
         if (last.tags && last.tags.includes("delete"))
             return reject({message: 'delete failed, already be deleted'});
         if (last.tags) {
@@ -120,8 +169,8 @@ Record.prototype.delete = function(date, id){
         else {
             last.tags = "delete"
         }
-        last.createdAt = new Date();
-        fs.writeFileSync(file, [...data, last]);
+        last.lastUpdatedAt = new Date();
+        fs.writeFileSync(file, JSON.stringify([...data, last]));
         return resolve(last);
     })
 }
@@ -134,18 +183,18 @@ Record.prototype.delete = function(date, id){
  */
 Record.prototype.undoDelete = function(date, id){
     return new Promise((resolve, reject) => {
-        const file = `${this.path}/${date}/${id}.json`;
+        const file = `${this.path}/${date}/${id}/metadata.json`;
         if (!fs.existsSync(file))
             return reject({message: 'not found file'});
         const data = JSON.parse(fs.readFileSync(file));
-        let last = data[data.length - 1];
+        let last = {...data[data.length - 1]};
         if (!last.hasOwnProperty("tags"))
             return reject({message: 'undo delete failed, not be deleted A'});
         if (last.tags && !last.tags.includes("delete"))
             return reject({message: 'undo delete failed, not be deleted B'});
         last.tags = last.tags.split(',').filter(p => p !== "delete").join(',');
-        last.createdAt = new Date();
-        fs.writeFileSync(file, [...data, last]);
+        last.lastUpdatedAt = new Date();
+        fs.writeFileSync(file, JSON.stringify([...data, last]));
         return resolve(last)
     })
 }
@@ -159,13 +208,13 @@ Record.prototype.undoDelete = function(date, id){
  */
 Record.prototype.update = function(date, id, content) {
     return new Promise((resolve, reject) => {
-        const file = `${this.path}/${date}/${id}.json`;
+        const file = `${this.path}/${date}/${id}/metadata.json`;
         if (!fs.existsSync(file))
             return reject({message: 'not found file'});
-        const data = fs.readFileSync(file);
-        const last = data[data.length - 1];
-        const newData = {...last, ...content, createdAt: new Date()};
-        fs.writeFileSync(p, [...data, newData]);
+        const data = JSON.parse(fs.readFileSync(file));
+        const last = {...data[data.length - 1]};
+        const newData = {...last, ...content, lastUpdatedAt: new Date()};
+        fs.writeFileSync(file, JSON.stringify([...data, newData]));
         return resolve(last)
     })
 }

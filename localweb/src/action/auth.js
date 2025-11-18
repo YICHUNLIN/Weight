@@ -18,3 +18,35 @@ export const GetTicket = (user) => {
             .catch(err => reject(err.response.data))
     })
 }
+
+
+export const doTicketLogin = () => {
+    return new Promise((resolve, reject) => {
+        const ticket = localStorage.getItem('ticket');
+        const config = {
+            headers: {
+                'authorization-client': `Basic ${CLIENT_SECRET}`,
+                'authorization': `Bearer ${ticket}`
+            }
+        }
+        axios.get(AUTH_URL + `/api/v3/auth/user`, config)
+        .then(resolve)
+        .catch(reject)
+    })
+}
+
+export const GetUsers = () => {
+    const ticket = localStorage.getItem('ticket');
+    const config ={
+        headers: {
+            'authorization-client': `Basic ${CLIENT_SECRET}`,
+            'authorization': `Bearer ${ticket}`
+        }
+    }
+    return new Promise((resolve, reject) => {
+        axios.get(AUTH_URL + `/api/v3/user`, config)
+        .then(res => resolve(res.data))
+        .catch(reject)
+    })
+}
+

@@ -9,12 +9,33 @@ import SignIn from './components/signIn';
 import { useState } from 'react';
 import { AppContext, Provider } from './storage/context';
 import { useContext } from 'react';
-
+import {doTicketLogin} from './action/auth'
 function App() {
   const [{auth:{isAuth}}, dispatch] = useContext(AppContext)
+  const [intervalId, setintervalId] = useState(null)
+
+  const clearUser = () => {
+    clearInterval(intervalId)
+    dispatch({type: 'DELETE_USER'});
+    setintervalId(null)
+  }
   const onSignInSuccess = (info) => {
     dispatch({type: 'SAVE_USER', payload: info})
   }
+
+  useEffect(() => {
+    if (isAuth){
+      doTicketLogin()
+          .then(r => console.log('check ticket successed'))
+          .catch(err => clearUser())
+      const intervalId = setInterval(() => {
+        doTicketLogin()
+          .then(r => console.log('check ticket successed'))
+          .catch(err => clearUser())
+      }, 1000*60*30)
+      setintervalId(intervalId)
+    }
+  }, [])
 
   return <div>
     {
@@ -22,18 +43,5 @@ function App() {
     }
   </div>
 }
-
-
-// function App() {
-//   const [auth, setAuth] = useState(null)
-
-//   return <AppContext.Provider value={{auth}}>
-//       {
-//         auth === null ? <SignIn onSuccess={info => {
-//           setAuth(info)
-//         }}/> :<AppProvider/>
-//       }
-//     </AppContext.Provider>
-// }
 
 export default App;

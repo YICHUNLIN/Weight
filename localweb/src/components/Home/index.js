@@ -4,10 +4,8 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useEffect } from 'react';
-import { useContext } from 'react';
-import { AppContext } from '../../storage/context';
-function Home({ pathname, ...others }) {
-  const [state, dispatch] = useContext(AppContext);
+import { connect } from '../../storage/context';
+const Home = ({ pathname, ...others }) => {
   return (
     <Box
       sx={{
@@ -18,7 +16,7 @@ function Home({ pathname, ...others }) {
         textAlign: 'center',
       }}
     >
-      <Typography>Dashboard content for {pathname}, Home, Hi ~ {state.auth.user?.name} </Typography>
+      <Typography>Dashboard content for {pathname}, Home, Hi  </Typography>
     </Box>
   );
 }

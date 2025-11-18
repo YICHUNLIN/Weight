@@ -1,0 +1,35 @@
+version: '3.1'
+
+services:
+  scale_server:
+    image: scale-server
+    build: ./scale_server
+    environment:
+      PORT: 80
+      selfAuthServer_clientId: 16d7ec86-8187-43a6-b51f-0ad944d3928f
+      selfAuthServer_secret: a47ef81384e6511f74005ef12ded5781
+      selfAuthServerUserAccount: "@scale_01"
+      selfAuthServerUserPassword: "tyGG?au!(U"
+      auth_server: https://odskey.kmn.tw
+      COM_PORT: /dev/tty.usbserial-1230
+      BAUD_RATE: 9600
+      APP_NAME: 金三榮地磅(總公司)
+    volumes:
+      - ~/scale_server:/usr/src/app/data
+
+
+  proxy:
+    image: nginx
+    restart: always
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/log:/var/log/nginx
+      - ./localweb/build:/var/www/scale
+    ports:
+      - 8080:80
+      - 443:443
+    links:
+      - scale_server
+    depends_on: 
+      - scale_server
+  

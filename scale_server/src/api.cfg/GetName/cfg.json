@@ -1,0 +1,8 @@
+{
+    "name":"/app_name",
+    "method": "get",
+    "auth": true,
+    "pms":["SCALE_USE"],
+    "desc": "取得名稱",
+    "index": "index.js"
+}

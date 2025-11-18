@@ -8,16 +8,28 @@ import Setting from './components/Setting'
 import Container from '@mui/material/Container';
 import MenuAppBar from './header';
 import Search from './components/Search';
-
+import { AppProvider } from '@toolpad/core/AppProvider';
+import { SignInPage } from '@toolpad/core/SignInPage';
 const pages = [
   {to: '/setting', route: <Setting/>, name: "Setting"},
   {to: '/search', route: <Search/>, name: "Search"},
 ];
-
+const providers = [
+  { id: 'github', name: 'GitHub' },
+  { id: 'google', name: 'Google' },
+  { id: 'facebook', name: 'Facebook' },
+  { id: 'twitter', name: 'Twitter' },
+  { id: 'linkedin', name: 'LinkedIn' },
+];
 const App = ({}) => {
   return (
     <>      
-
+      <SignInPage
+        providers={providers}
+        signIn={async (provider) => {
+          // Your sign in logic
+        }}
+      />
       <MenuAppBar pages={pages}/>
       <Container maxWidth="false">
         <Switch>

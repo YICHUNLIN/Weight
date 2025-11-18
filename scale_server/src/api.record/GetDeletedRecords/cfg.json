@@ -1,0 +1,8 @@
+{
+    "name":"/deleted",
+    "method": "get",
+    "auth": true,
+    "pms":["SCALE_USE_LOCAL_CLIENT"],
+    "desc": "取得被刪除的過磅紀錄",
+    "index": "index.js"
+}

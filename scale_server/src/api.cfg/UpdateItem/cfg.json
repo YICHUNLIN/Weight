@@ -1,0 +1,8 @@
+{
+    "name":"/items",
+    "method": "patch",
+    "auth": true,
+    "pms":["SCALE_SETTING_CONFIG"],
+    "desc": "更新貨物種類",
+    "index": "index.js"
+}
