@@ -11,11 +11,10 @@ services:
       selfAuthServerUserAccount: "@scale_01"
       selfAuthServerUserPassword: "tyGG?au!(U"
       auth_server: https://odskey.kmn.tw
-      COM_PORT: /dev/tty.usbserial-1230
-      BAUD_RATE: 9600
       APP_NAME: 金三榮地磅(總公司)
     volumes:
       - ~/scale_server:/usr/src/app/data
+      - ~/.env:/usr/src/app/.env
 
 
   proxy:
