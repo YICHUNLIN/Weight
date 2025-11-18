@@ -7,12 +7,13 @@ const cors = require('cors');
 const Auth = require('./utils/auth')
 const MContext = require('./context');
 const context = new MContext();
+const {Config} = context.models;
 const objectServer = require('./utils/ObjectServer')({
-    clientId: process.env.selfAuthServer_clientId, 
-    secret: process.env.selfAuthServer_secret,
-    url: process.env.auth_server,
-    selfAuthServerUserAccount: process.env.selfAuthServerUserAccount,
-    selfAuthServerUserPassword: process.env.selfAuthServerUserPassword
+    clientId: Config.getConfig("AUTH_CLIENT_ID").value, 
+    secret: Config.getConfig("AUTH_CLIENT_SECRET").value,
+    url: Config.getConfig("AUTH_SERVER").value,
+    selfAuthServerUserAccount: Config.getConfig("AUTH_CLIENT_USER_ACCOUNT").value,
+    selfAuthServerUserPassword: Config.getConfig("AUTH_CLIENT_USER_PASSWORD").value
 })
 
 var app = express();

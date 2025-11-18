@@ -1,11 +1,11 @@
 const CryptoJS = require('crypto-js');
 var jwt = require('jsonwebtoken');
-const {v4: uuidv4} = require('uuid');
 const axios = require('axios');
-var expires = require('expires');
+const fs = require('fs')
 
 
 function ObjectServer(options){
+    
     var words = CryptoJS.enc.Utf8.parse(`${options.clientId}:${options.secret}`);
     this.client_cert = CryptoJS.enc.Base64.stringify(words);
     this.account = options.selfAuthServerUserAccount;

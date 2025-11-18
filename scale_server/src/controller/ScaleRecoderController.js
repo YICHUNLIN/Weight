@@ -1,15 +1,17 @@
 const { SerialPort } = require('serialport');
-const {COM_PORT,BAUD_RATE} = process.env;
 function ScaleRecoderController(context){
     this.context = context;
     this.port = null;
+    const {Config} = context.models;
+    this.COM_PORT = Config.getConfig("AUTH_CLIENT_USER_ACCOUNT").value
+    this.BAUD_RATE = Config.getConfig("AUTH_CLIENT_USER_PASSWORD").value
 }
 
 ScaleRecoderController.prototype.start = function(onData, onError, onOpen){
-    console.log(`[RS-232] 嘗試連接埠 ${COM_PORT} (Baud: ${BAUD_RATE})...`);
+    console.log(`[RS-232] 嘗試連接埠 ${this.COM_PORT} (Baud: ${this.BAUD_RATE})...`);
     this.port = new SerialPort({
-        path: COM_PORT,
-        baudRate: parseInt(BAUD_RATE),
+        path: this.COM_PORT,
+        baudRate: parseInt(this.BAUD_RATE),
     }, (err) => {
         if (err) {
             console.error(`[!] 錯誤: 無法開啟連接埠: ${err.message}`);

@@ -28,12 +28,14 @@ function ItemSetting({ pathname }) {
     <Table>
       <TableHead>
         <TableRow>
+          <TableCell></TableCell>
           <TableCell>項目</TableCell>
           <TableCell></TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
         <TableRow>
+          <TableCell></TableCell>
           <TableCell>
               <TextField label="新增" 
                           variant="standard" 
@@ -49,6 +51,7 @@ function ItemSetting({ pathname }) {
         </TableRow>
         {
           items.map((item, i) => <TableRow key={`item_${i}`}>
+            <TableCell>{i+1})</TableCell>
             <TableCell>
               <TextField 
                 variant="standard"

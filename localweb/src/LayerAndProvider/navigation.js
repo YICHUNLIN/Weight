@@ -1,6 +1,13 @@
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
+import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import TodayIcon from '@mui/icons-material/Today';
+import ScaleIcon from '@mui/icons-material/Scale';
+import SettingsIcon from '@mui/icons-material/Settings';
+import CategoryIcon from '@mui/icons-material/Category';
+import SettingsSystemDaydreamIcon from '@mui/icons-material/SettingsSystemDaydream';
 const NAVIGATION = [
   {
     kind: 'header',
@@ -9,22 +16,22 @@ const NAVIGATION = [
   {
     segment: 'scale',
     title: '地磅功能',
-    icon: <DashboardIcon />,
+    icon: <ScaleIcon />,
     children: [
       {
         segment: 'today',
-        icon: <TimelineIcon />,
+        icon: <TodayIcon />,
         title: '本日資料',
         pattern: 'today/:date'
       },
       {
         segment: 'history',
-        icon: <TimelineIcon />,
+        icon: <FormatListNumberedIcon />,
         title: '歷史資料'
       },
       {
         segment: 'deleted',
-        icon: <TimelineIcon />,
+        icon: <DeleteForeverIcon />,
         title: '被刪除的資料',
         allow: "SCALE_MAMAGE_DELETE"
       }
@@ -33,14 +40,14 @@ const NAVIGATION = [
   {
     segment: 'setting',
     title: '設定',
-    icon: <TimelineIcon />,
+    icon: <SettingsIcon />,
     allow: "SCALE_SETTING_CONFIG",
     children:[
       {
         segment: 'items',
         title: '貨物種類',
-        icon: <TimelineIcon />,
-      },
+        icon: <CategoryIcon />,
+      }
     ]
   },
 ];

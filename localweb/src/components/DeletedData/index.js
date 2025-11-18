@@ -2,15 +2,17 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
-import {Table, TableHead, TableRow, TableCell, TableBody} from '@mui/material';
+import {Table, TableHead, TableRow, TableCell, TableBody, Button} from '@mui/material';
 import { PageContainer, PageHeaderToolbar } from '@toolpad/core/PageContainer';
 import { getDeletedRecord } from '../../action/scale';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import OptSelect from '../com/OptSelect';
 import { GetUsers } from '../../action/auth';
+import { useGlobalContext } from '../../storage/context';
 
 const Content = ({data}) => {
+  const [{auth: {user}}, dispatch] = useGlobalContext()
   const [users, setUsers] = useState({})
     useEffect(() => {
       GetUsers()
@@ -31,7 +33,8 @@ const Content = ({data}) => {
         <TableCell>{d.car} / {d.driver}</TableCell>
         <TableCell>{ (new Date(d.createdAt)).toLocaleTimeString()}</TableCell>
         <TableCell>{!users.hasOwnProperty(d.createdBy) ? "---" : users[d.createdBy].account}</TableCell>
-
+        <TableCell>
+        </TableCell>
       </TableRow>)
     }
   </TableBody>
@@ -56,7 +59,7 @@ function DeletedData({ pathname }) {
             title={"選擇日期"}
             v={selectDate}
             fullWidth
-            onSelect={e => {}}/>
+            onSelect={e => setSelectDate(e)}/>
       </PageHeaderToolbar>
       <Table>
           <TableHead>

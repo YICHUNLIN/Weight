@@ -3,7 +3,7 @@
  */
 module.exports = function(context){
     const {} = context.controller;
-    const {Record, Scale} = context.models;
+    const {Record, Scale, Config} = context.models;
     return [
         (req, res, next) => {
             // 貨物名稱
@@ -42,18 +42,21 @@ module.exports = function(context){
             delete req.body.tags;
             delete req.body.id;
             req.body.createdBy = req.loginState.id;
-            Scale.getData()
-                .then(r => {
-                    const data = {...req.body, chunk:r}
-                    Record.create(data)
-                        .then(r => res.status(200).json({code: 200, data: r}))
-                        .catch(err => res.status(400).json({code: 400, err}))
-                })
-                .catch(err => {
-                    Record.create(req.body)
-                        .then(r => res.status(200).json({code: 200, data: r, message: err}))
-                        .catch(e => res.status(400).json({code: 400, e}))
-                })
+            const scale_enable = Config.getConfig("SCALE_ENABLE");
+            Record.create(req.body)
+                .then(
+                    ({id, date}) =>{
+                        if (!scale_enable.value) 
+                            return res.status(200).json({code: 200, id, date, message: 'create record successed, without chunk!'})
+                        return Scale.getData()
+                                    .then(chunk => 
+                                        Record.saveChunk(id, date, chunk)
+                                            .then(r => res.status(200).json({code: 200, id, date, message: 'create record successed, with chunk!'}))
+                                    )
+                                    .catch(err => res.status(200).json({code: 200, id, date, message: 'create record successed, without chunk!'}))
+                    }             
+                )
+                .catch(err => res.status(400).json({code: 400, err}))
         }
     ]
 };

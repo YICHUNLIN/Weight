@@ -1,0 +1,7 @@
+{
+    "name":"/config/init",
+    "method": "get",
+    "auth": false,
+    "desc": "取得設定檔資料,僅限第一次使用",
+    "index": "index.js"
+}

@@ -36,7 +36,17 @@ Record.prototype.create = function(data){
         const d = {id: time.getTime(),...data, createdAt: time};
         fs.mkdirSync(`${p}/${d.id}`)
         fs.writeFileSync(`${p}/${d.id}/metadata.json`, JSON.stringify([d]))
-        return resolve();
+        return resolve({id: d.id, date});
+    })
+}
+
+
+Record.prototype.saveChunk = function(id, date, data) {
+    return new Promise((resolve, reject) => {
+        const p = `${this.path}/${date}`;
+        const time = new Date();
+        fs.writeFileSync(`${p}/${id}/chunk.json`, JSON.stringify({data, createdAt: time}));
+        return resolve(time)
     })
 }
 

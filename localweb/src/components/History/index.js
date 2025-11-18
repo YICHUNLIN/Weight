@@ -8,13 +8,22 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { GetUsers } from '../../action/auth';
 import { XLSX_write_ForRangeRecordsBydate } from '../com/ExportExcel';
-
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 const Content = ({date, data, users}) => {
+  const [open, setOpen] = useState(true)
   return <>
-    <TableRow><TableCell colSpan={10}>{date}</TableCell></TableRow>
+    <TableRow>
+      <TableCell colSpan={10}>
+        {date}
+        <Button onClick={e => setOpen(!open)}>
+          {open ? <ArrowDropDownIcon/> : <ArrowDropUpIcon/>}
+        </Button> 
+      </TableCell>
+    </TableRow>
     {
-      data.map((d, i) => <TableRow key={`${date}_${i}`}>
-        <TableCell></TableCell>
+      open ? data.map((d, i) => <TableRow key={`${date}_${i}`}>
+        <TableCell>{i+1} )</TableCell>
         <TableCell style={{ backgroundColor: d.inorout !== "INPORT" ? "#ff8400ff" : "#14cc76ff" }} >
           {d.inorout === "INPORT" ? "進場" : "出場"}
         </TableCell>
@@ -25,7 +34,7 @@ const Content = ({date, data, users}) => {
         <TableCell>{d.car} / {d.driver}</TableCell>
         <TableCell>{ (new Date(d.createdAt)).toLocaleTimeString()}</TableCell>
         <TableCell>{!users.hasOwnProperty(d.createdBy) ? "---" : users[d.createdBy].account}</TableCell>
-      </TableRow>)
+      </TableRow>) : ''
     }
   </>
 }

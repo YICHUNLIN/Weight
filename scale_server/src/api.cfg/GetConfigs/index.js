@@ -3,10 +3,9 @@
  */
 module.exports = function(context){
     const {} = context.controller;
-    const {Config} = context.models;
+    const {} = context.models;
     return [
         (req, res) => {
-            return res.status(200).json({code: 200, name: Config.getConfig("APP_NAME").value})
         }
     ]
 };
