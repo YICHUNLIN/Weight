@@ -80,3 +80,15 @@
 # scale_server_global
 
 > 給外人用的,放在外面VPS
+
+
+
+# 部署 localweb 與 scale_server
+
+> 1. 安裝 docker
+
+```shell
+
+cd weight
+sudo docker up -d
+```
