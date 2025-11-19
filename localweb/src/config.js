@@ -6,4 +6,5 @@ export const OS_CLIENTSECRET = "a47ef81384e6511f74005ef12ded5781";
 export const AUTH_URL = "https://odskey.kmn.tw";
 export const CLIENT_SECRET = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(`${OS_CLIENTID}:${OS_CLIENTSECRET}`));
 
-export const SCALE_URL = "http://localhost:9930"
+//export const SCALE_URL = "http://localhost:9930"
+export const SCALE_URL = "http://192.168.1.118"

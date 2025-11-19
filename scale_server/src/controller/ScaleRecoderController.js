@@ -3,8 +3,8 @@ function ScaleRecoderController(context){
     this.context = context;
     this.port = null;
     const {Config} = context.models;
-    this.COM_PORT = Config.getConfig("AUTH_CLIENT_USER_ACCOUNT").value
-    this.BAUD_RATE = Config.getConfig("AUTH_CLIENT_USER_PASSWORD").value
+    this.COM_PORT = Config.getConfig("SCALE_COM_PORT").value
+    this.BAUD_RATE = Config.getConfig("SCALE_BAUD_RATE").value
 }
 
 ScaleRecoderController.prototype.start = function(onData, onError, onOpen){
