@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import {Table,TableHead,TableRow,TableCell,TableBody} from '@mui/material';
+import {Table,TableHead,TableRow,TableCell,TableBody, Tooltip, Button} from '@mui/material';
 import { PageContainer,PageHeaderToolbar } from '@toolpad/core/PageContainer';
 import Create from './create';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -78,7 +78,7 @@ function ScaleToday({ pathname }) {
                 <TableCell style={{ backgroundColor: d.inorout !== "INPORT" ? "#ff8400ff" : "#14cc76ff" }} >
                   {d.inorout === "INPORT" ? "進場" : "出場"}
                 </TableCell>
-                <TableCell>{d.source_or_destination}</TableCell>
+                <TableCell>{d.client} / {d.source_or_destination}</TableCell>
                 <TableCell>{d.item}</TableCell>
                 <TableCell>{d.number}</TableCell>
                 <TableCell>{d.empty}</TableCell>

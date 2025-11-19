@@ -42,13 +42,22 @@ const Content = ({date, data, users}) => {
 function History({ pathname }) {
   const [users, setUsers] = useState({})
   const [search, setSearch] = useState(
-      {start: new Date().toISOString().split('T')[0], 
-        end: new Date().toISOString().split('T')[0]
-    })
+      {
+        start: new Date().toISOString().split('T')[0], 
+        end: new Date().toISOString().split('T')[0],
+        car: ""
+      }
+  )
   const [data, setData] = useState({})
   useEffect(() => {
       getRangeRecord(search.start, search.end)
-        .then(setData)
+        .then(rr => {
+            let r = rr;
+            if (search.car !== "") {
+              r = Object.keys(rr).reduce((map, key) => ({...map, [key]:rr[key].filter(d => d.car.includes(search.car))}), {})
+            }
+            setData(r)
+        })
         .catch(console.log)
   }, [search])
 
@@ -61,6 +70,14 @@ function History({ pathname }) {
     setSearch({...search, ...data})
   }
   return (<PageContainer  >
+      <PageHeaderToolbar>
+        <TextField
+            label="車號搜尋"
+            value={search.car}
+            onChange={e => update({car: e.target.value})}
+            variant="standard"
+            fullWidth/>
+      </PageHeaderToolbar>
       <PageHeaderToolbar>
         <TextField
             label=""
@@ -77,8 +94,9 @@ function History({ pathname }) {
             variant="standard"
             type='date'
             fullWidth/>
+      </PageHeaderToolbar>
+      <PageHeaderToolbar>
         <Button onClick={e => {
-          // const v = Object.values(data).reduce((map, v) => [...map, ...v], []);
           XLSX_write_ForRangeRecordsBydate(data, users)
         }}>匯出excel</Button>
       </PageHeaderToolbar>

@@ -6,12 +6,6 @@ services:
     build: ./scale_server
     environment:
       PORT: 80
-      selfAuthServer_clientId: 16d7ec86-8187-43a6-b51f-0ad944d3928f
-      selfAuthServer_secret: a47ef81384e6511f74005ef12ded5781
-      selfAuthServerUserAccount: "@scale_01"
-      selfAuthServerUserPassword: "tyGG?au!(U"
-      auth_server: https://odskey.kmn.tw
-      APP_NAME: 金三榮地磅(總公司)
     volumes:
       - ~/scale_server:/usr/src/app/data
       - ~/.env:/usr/src/app/.env
