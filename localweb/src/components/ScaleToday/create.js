@@ -106,7 +106,7 @@ function RecordForms({items}) {
   return (
           <List>
             <ListItem>
-                <InOutSelect onChange={value =>setFormData({ inorout: value})}/>
+                <InOutSelect onChange={value =>Update({ inorout: value})}/>
             </ListItem>
             <ListItem>
             </ListItem>

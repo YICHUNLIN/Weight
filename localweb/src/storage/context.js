@@ -11,13 +11,16 @@ const Provider = ({children}) => {
     </AppContext.Provider>
 }
 
-const connect = (stateMap, funcMap) => (node) =>{
-    const [state, dispatch] = useContext(AppContext);
-    const mapFunc = Object.keys(funcMap).reduce((map, key) => {
-        return {...map, [key]: funcMap[key](dispatch)}
-    }, {})
-    return React.cloneElement(node,{...stateMap(state), ...mapFunc})
+const connect = (stateMap, funcMap) => {
+    return (WrappedComponent) => () => {
+        const [state, dispatch] = useContext(AppContext);
+        const mapFunc = Object.keys(funcMap).reduce((map, key) => {
+            return {...map, [key]: funcMap[key](dispatch)}
+        }, {})
+        return <WrappedComponent {...state} {...stateMap} {...mapFunc}/>
+    }
 }
+
 
 
 const useGlobalContext = () => {

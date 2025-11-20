@@ -8,6 +8,9 @@ import { connect } from '../../storage/context';
 import { PageContainer,PageHeaderToolbar } from '@toolpad/core/PageContainer';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 const Home = ({ pathname, ...others }) => {
+  useEffect(() => {
+    console.log(others)
+  }, [others])
   return (
     <PageContainer>
       <Table>
@@ -30,4 +33,10 @@ Home.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
 
-export default Home;
+const mapProp = () => {
+  return {
+
+  }
+}
+
+export default connect(mapProp,{})(Home);
