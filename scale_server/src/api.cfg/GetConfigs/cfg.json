@@ -1,7 +1,8 @@
 {
     "name":"/config/init",
     "method": "get",
-    "auth": false,
+    "auth": true,
+    "pms":[],
     "desc": "取得設定檔資料,僅限第一次使用",
     "index": "index.js"
 }
