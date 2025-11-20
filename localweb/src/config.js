@@ -10,8 +10,8 @@ const getScaleURL = () => {
     const key = "SCALE_URL";
     let url = localStorage.getItem(key);
     if (!url){
-        url = "http://localhost:9930"
-        localStorage.setItem(key, "http://localhost:9930")
+        url = "http://192.168.0.198"
+        localStorage.setItem(key, "http://192.168.0.198")
     }
     console.log(url)
     return url;
