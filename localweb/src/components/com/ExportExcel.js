@@ -2,7 +2,7 @@ import { utils, writeFile } from 'xlsx';
 
 
 export const XLSX_write_ForRangeRecordsBydate = (data, users) => {
-    const headers = ['序號', '日期-時間', '進/出','客戶' ,'來源/目的地', '貨物內容', '總重', '空車重', '淨重', '車輛/司機', '紀錄者'];
+    const headers = ['序號', '日期-時間', '進/出','客戶' ,'來源/目的地', '貨物內容','貨物說明', '總重', '空車重', '淨重', '車輛/司機', '紀錄者'];
     const wb = utils.book_new();
     Object.keys(data)
         .forEach(date => {
@@ -14,6 +14,7 @@ export const XLSX_write_ForRangeRecordsBydate = (data, users) => {
                         d.client,
                         d.source_or_destination,
                         d.item,
+                        d.desc,
                         d.number,
                         d.empty,
                         d.number - d.empty,

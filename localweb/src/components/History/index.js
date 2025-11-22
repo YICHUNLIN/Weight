@@ -28,7 +28,7 @@ const Content = ({date, data, users}) => {
           {d.inorout === "INPORT" ? "進場" : "出場"}
         </TableCell>
         <TableCell>{d.client} / {d.source_or_destination}</TableCell>
-        <TableCell>{d.item}</TableCell>
+        <TableCell>{d.item} / {d.desc}</TableCell>
         <TableCell>{d.number}</TableCell>
         <TableCell>{d.empty}</TableCell>
         <TableCell>{d.car} / {d.driver}</TableCell>
