@@ -9,6 +9,12 @@ import { PageContainer,PageHeaderToolbar } from '@toolpad/core/PageContainer';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 const items = [
   {
+    version: 'Beta-0.02',
+    content: '更新Excel輸出,加入貨物說明',
+    updatedAt: '2025/11/20',
+    updatedBy: '林逸群'
+  },
+  {
     version: 'Beta-0.01',
     content: '初次上線',
     updatedAt: '2025/11/20',
