@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 const items = [
   {
     version: 'Beta-0.02',
-    content: '更新Excel輸出,加入貨物說明',
+    content: '(1)更新Excel輸出:加入貨物說明 (2)新增功能:新增時可選擇儲存車輛資訊,下次輸入(當日)可以自動帶入',
     updatedAt: '2025/11/20',
     updatedBy: '林逸群'
   },

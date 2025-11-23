@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import { useGlobalContext } from '../../storage/context';
 import Update from './update';
 import { GetUsers } from '../../action/auth';
-import { GetItems } from '../../action/cfg';
+import { GetDailyConfig, GetItems } from '../../action/cfg';
 import DeleteDialog from './delete';
 
 const ActionOptios = ({d, user, onUpdate, onDelete, items}) => {
@@ -29,10 +29,14 @@ function ScaleToday({ pathname }) {
   const [data, setData] = useState([])
   const [users, setUsers] = useState({})
   const [items, setItems] = useState([])
+  const [dc, setDailyConfig] = useState({})
 
   const getData = () => {
     findDataByDate(today)
       .then(setData)
+      .catch(console.log)
+    GetDailyConfig(today)
+      .then(setDailyConfig)
       .catch(console.log)
   }
 
@@ -51,6 +55,7 @@ function ScaleToday({ pathname }) {
   return (<PageContainer title={today}>
       <PageHeaderToolbar>
         <Create 
+          dc={dc}
           items={items}
           onUpdate={e => {
             getData()

@@ -1,0 +1,8 @@
+{
+    "name":"/daily/:date",
+    "method": "post",
+    "auth": true,
+    "pms":["SCALE_CREATE_RECORD"],
+    "desc": "更新每日設定",
+    "index": "index.js"
+}

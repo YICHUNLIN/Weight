@@ -15,6 +15,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import OptSelect from '../com/OptSelect';
 import { createRecord } from '../../action/scale';
+import CheckOptions from './checkOptions';
 
 function TransactionDialog({ payload, open, onClose }) {
   const [loading, setLoading] = useState(false);
@@ -98,7 +99,7 @@ const InOutSelect = ({onChange}) => {
   );
 }
 
-function RecordForms({items}) {
+function RecordForms({items, dc}) {
   const { formData, setFormData } = useFormContext();
   const Update = (data) => {
     setFormData({...formData, ...data})
@@ -129,7 +130,14 @@ function RecordForms({items}) {
                     variant='standard'
                     fullWidth
                     value={formData.car}
-                    onChange={e => Update({ car: e.target.value})}
+                    onChange={e => {
+                      if (dc.hasOwnProperty(e.target.value)){
+                        const t = dc[e.target.value];
+                        Update({ car: e.target.value, driver: t.driver, empty: t.empty});
+                      } else {
+                        Update({ car: e.target.value, empty: 0, driver: ''});
+                      }
+                    }}
                     label="車號"/>
                 <TextField
                     variant='standard'
@@ -169,11 +177,14 @@ function RecordForms({items}) {
                     onChange={e => Update({ empty: parseInt(e.target.value)})}
                     type='number'/>
             </ListItem>
+            <ListItem>
+              <CheckOptions onCheck={cs => Update({config: cs})}/>
+            </ListItem>
         </List>
   );
 }
 
-function Content({onUpdate, onInit, items}) {
+function Content({onUpdate, onInit, items, dc}) {
   const dialogs = useDialogs();
 
   return (
@@ -181,7 +192,7 @@ function Content({onUpdate, onInit, items}) {
         onClick={async () => {
           onInit()
           const data = await dialogs.open(TransactionDialog, {
-            component: <RecordForms items={items}/>
+            component: <RecordForms items={items} dc={dc}/>
           });
           onUpdate()
         }}
@@ -202,7 +213,7 @@ const initFormData = {
     desc: "",
     client: ""
   };
-export default function Create({onUpdate, items}) {
+export default function Create({onUpdate, items, dc}) {
   const [formData, setFormData] = React.useState(initFormData);
 
   const contextValue = React.useMemo(() => ({ formData, setFormData }), [formData]);
@@ -210,7 +221,7 @@ export default function Create({onUpdate, items}) {
   return (
     <FormContext.Provider value={contextValue}>
       <DialogsProvider>
-        <Content onUpdate={onUpdate} items={items} onInit={e => {
+        <Content onUpdate={onUpdate} dc={dc} items={items} onInit={e => {
           setFormData(initFormData)
         }}/>
       </DialogsProvider>

@@ -32,6 +32,21 @@ export const UpdateItems = (newList) => {
     })
 }
 
+export const GetDailyConfig = (date) => {
+    const ticket = localStorage.getItem('ticket');
+    const config ={
+        headers: {
+            'authorization-client': `Basic ${CLIENT_SECRET}`,
+            'authorization': `Bearer ${ticket}`
+        }
+    }
+    return new Promise((resolve, reject) => {
+        axios.get(`${SCALE_URL}/api/cfg/daily/${date}`, config)
+            .then(r => resolve(r.data.data))
+            .catch(reject)
+    })
+}
+
 export const GetAppName = () => {
     const ticket = localStorage.getItem('ticket');
     const config ={

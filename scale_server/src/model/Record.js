@@ -27,6 +27,7 @@ Record.prototype.checkOwner = function(date, id, userId){
  * @returns 
  */
 Record.prototype.create = function(data){
+    const {DailyConfig} = this.context.models;
     return new Promise((resolve, reject) => {
         const time = new Date();
         const date = time.toISOString().split('T')[0];
@@ -36,7 +37,12 @@ Record.prototype.create = function(data){
         const d = {id: time.getTime(),...data, createdAt: time};
         fs.mkdirSync(`${p}/${d.id}`)
         fs.writeFileSync(`${p}/${d.id}/metadata.json`, JSON.stringify([d]))
-        return resolve({id: d.id, date});
+        if (data.config && data.config.carInfo){
+            DailyConfig.update(date, {[data.car]:{empty: data.empty, driver: data.driver}})
+                .then(r => {
+                    return resolve({id: d.id, date, message: 'save car config'})
+                }).catch(reject)
+        } else return resolve({id: d.id, date});
     })
 }
 
