@@ -15,7 +15,8 @@ const objectServer = require('./utils/ObjectServer')({
     selfAuthServerUserAccount: Config.getConfig("AUTH_CLIENT_USER_ACCOUNT").value,
     selfAuthServerUserPassword: Config.getConfig("AUTH_CLIENT_USER_PASSWORD").value
 })
-
+console.log("AUTH SERVER=",Config.getConfig("AUTH_SERVER").value)
+console.log("AUTH ACCOUNT=",Config.getConfig("AUTH_CLIENT_USER_ACCOUNT").value)
 var app = express();
 
 app.use(cookieParser());
