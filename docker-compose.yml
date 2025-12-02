@@ -5,6 +5,7 @@ services:
     image: scale-server
     build: ./scale_server
     restart: always
+    privileged: true
     environment:
       PORT: 80
     volumes:
