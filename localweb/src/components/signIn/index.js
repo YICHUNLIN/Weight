@@ -83,7 +83,7 @@ function Subtitle(props) {
   }, [url])
   return (<>
     <p>請使用文件系統帳號</p>
-    <OptSelect data={servers}
+    <OptSelect data={servers} disabled
               v={url}
               onSelect={e => setURL(e)}
               valueField='url' 

@@ -1,6 +1,12 @@
 const initState = {
     today:[],
-    url: localStorage.getItem("SCALE_URL")
+    url: (() => {
+        const defaultURL = window.location.href
+        const u = localStorage.getItem("SCALE_URL");
+        if (u) return u;
+        localStorage.setItem("SCALE_URL", defaultURL)
+        return defaultURL
+    })()
 }
 
 export default (state = initState, action) => {
