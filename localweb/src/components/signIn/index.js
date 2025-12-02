@@ -7,8 +7,17 @@ import {
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import KeyIcon from '@mui/icons-material/Key';
 import { useTheme } from '@mui/material/styles';
+import OptSelect from '../com/OptSelect';
+import { useEffect } from 'react';
+import { useContext } from 'react';
+import { AppContext } from '../../storage/context';
 const providers = [
   { id: 'credentials', name: 'Jung`s ODS key' }
+];
+
+const servers = [
+  {name: '總公司', url: "http://192.168.0.198"},
+  {name: '預拌廠工務所', url: "http://192.168.0.194"}
 ];
 
 function CustomAccountField() {
@@ -60,8 +69,26 @@ function Title() {
   return <h2 style={{ marginBottom: 8 }}>金三榮地磅系統</h2>;
 }
 
-function Subtitle() {
-  return (<>請使用文件系統帳號</>);
+function Subtitle(props) {
+  const [{scale:{url}}, dispatch] = useContext(AppContext)
+  const setURL = (url) => {
+    dispatch({type: 'SET_SCALE_URL', payload: url})
+  }
+  useEffect(() => {
+    dispatch({type: 'GET_SCALE_URL'})
+  }, [])
+
+  useEffect(() => {
+    if (!url) dispatch({type: 'SET_SCALE_URL', payload: servers[0].url})
+  }, [url])
+  return (<>
+    <p>請使用文件系統帳號</p>
+    <OptSelect data={servers}
+              v={url}
+              onSelect={e => setURL(e)}
+              valueField='url' 
+              title='請選擇伺服器' />
+  </>);
 }
 function CustomButton() {
   return (

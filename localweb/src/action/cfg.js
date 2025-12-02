@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {SCALE_URL,CLIENT_SECRET} from '../config'
+import {getScaleURL,CLIENT_SECRET} from '../config'
 
 
 export const GetItems = () => {
@@ -11,7 +11,7 @@ export const GetItems = () => {
         }
     }
     return new Promise((resolve, reject) => {
-        axios.get(`${SCALE_URL}/api/cfg/items`, config)
+        axios.get(`${getScaleURL()}/api/cfg/items`, config)
             .then(r => resolve(r.data.data))
             .catch(reject)
     })
@@ -26,7 +26,7 @@ export const UpdateItems = (newList) => {
         }
     }
     return new Promise((resolve, reject) => {
-        axios.patch(`${SCALE_URL}/api/cfg/items`,{content: newList}, config)
+        axios.patch(`${getScaleURL()}/api/cfg/items`,{content: newList}, config)
             .then(r => resolve())
             .catch(reject)
     })
@@ -41,7 +41,7 @@ export const GetDailyConfig = (date) => {
         }
     }
     return new Promise((resolve, reject) => {
-        axios.get(`${SCALE_URL}/api/cfg/daily/${date}`, config)
+        axios.get(`${getScaleURL()}/api/cfg/daily/${date}`, config)
             .then(r => resolve(r.data.data))
             .catch(reject)
     })
@@ -56,7 +56,7 @@ export const GetAppName = () => {
         }
     }
     return new Promise((resolve, reject) => {
-        axios.get(`${SCALE_URL}/api/cfg/app_name`, config)
+        axios.get(`${getScaleURL()}/api/cfg/app_name`, config)
             .then(r => resolve(r.data.name))
             .catch(reject)
     })

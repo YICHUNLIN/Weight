@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {SCALE_URL,CLIENT_SECRET} from '../config'
+import {getScaleURL,CLIENT_SECRET} from '../config'
 
 export const findDataByDate = (date) => {
     const ticket = localStorage.getItem('ticket');
@@ -10,7 +10,7 @@ export const findDataByDate = (date) => {
         }
     }
     return new Promise((resolve, reject) => {
-        axios.get(`${SCALE_URL}/api/record?date=${date}`, config)
+        axios.get(`${getScaleURL()}/api/record?date=${date}`, config)
             .then(r => {
                 const d = r.data.data;
                 resolve(d.hasOwnProperty(date) ? d[date].map(t => t[t.length - 1]) : [])
@@ -34,7 +34,7 @@ export const getRangeRecord = (start, end) => {
         }
     }
     return new Promise((resolve, reject) => {
-        axios.get(`${SCALE_URL}/api/record/range?start=${start}&end=${end}`, config)
+        axios.get(`${getScaleURL()}/api/record/range?start=${start}&end=${end}`, config)
             .then(r => {
                 const d = r.data.data;
                 resolve(d)
@@ -52,7 +52,7 @@ export const createRecord = (data) => {
         }
     }
     return new Promise((resolve, reject) => {
-        axios.post(`${SCALE_URL}/api/record`, data, config)
+        axios.post(`${getScaleURL()}/api/record`, data, config)
             .then(resolve)
             .catch(err => reject(err))
     })
@@ -74,7 +74,7 @@ export const updateRecord = (date, id, data) => {
         }
     }
     return new Promise((resolve, reject) => {
-        axios.patch(`${SCALE_URL}/api/record/${date}/${id}`, data, config)
+        axios.patch(`${getScaleURL()}/api/record/${date}/${id}`, data, config)
             .then(resolve)
             .catch(reject)
     })
@@ -95,7 +95,7 @@ export const deleteRecord = (date, id) => {
         }
     }
     return new Promise((resolve, reject) => {
-        axios.delete(`${SCALE_URL}/api/record/${date}/${id}`, config)
+        axios.delete(`${getScaleURL()}/api/record/${date}/${id}`, config)
             .then(resolve)
             .catch(reject)
     })
@@ -126,7 +126,7 @@ export const getDeletedRecord = () => {
         }
     }
     return new Promise((resolve, reject) => {
-        let url = `${SCALE_URL}/api/record/deleted`
+        let url = `${getScaleURL()}/api/record/deleted`
         axios.get(url, config)
             .then(r => {
                 const d = r.data.data;

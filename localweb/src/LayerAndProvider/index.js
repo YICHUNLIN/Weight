@@ -13,6 +13,7 @@ import { useEffect } from 'react';
 import jungIcon from '../asserts/JA-192x192.png'
 import { GetAppName } from '../action/cfg';
 import { useState } from 'react';
+import { SCALE_URL } from '../config';
 
 function AppProviderBasic({ window, ...others }) {
   const [BRANDING, setBRANDING] = useState({
@@ -25,7 +26,7 @@ function AppProviderBasic({ window, ...others }) {
     ),
     title: '金三榮地磅',
   })
-  const [state, dispatch] = useContext(AppContext);
+  const [{auth, scale}, dispatch] = useContext(AppContext)
   const [session, setSession] = React.useState({
     user: {
       name: '',
@@ -33,12 +34,11 @@ function AppProviderBasic({ window, ...others }) {
     },
   });
   useEffect(() => {
-    const {auth} = state;
     setSession({...session, user: {name: auth.user?.name, email: auth.user?.email}})
     GetAppName()
       .then(name => setBRANDING({...BRANDING, title: name}))
       .catch(console.log)
-  }, [state.auth])
+  }, [scale.url])
   const authentication = React.useMemo(() => {
     return {
       signOut: () => {
@@ -56,7 +56,7 @@ function AppProviderBasic({ window, ...others }) {
   return (
     <AppProvider
         session={session}
-        navigation={GetNav(state.auth.user.permissions.map(p => p.name))}
+        navigation={GetNav(auth.user.permissions.map(p => p.name))}
         branding={BRANDING}
         router={router}
         theme={DefaultTheme}
