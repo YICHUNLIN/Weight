@@ -1,0 +1,38 @@
+
+const Scale = require('../utils/scale')
+const CODEBOOK_SCALE = require('../config/codebook_scale')
+const {COM_PORT,BAUD_RATE} = process.env;
+function ScaleController(context){
+    this.context = context;
+    this.scale = new Scale(COM_PORT,parseInt(BAUD_RATE), CODEBOOK_SCALE);
+    this.weight = null;
+    this.error = null;
+    this.message = null;
+    this.observes = {};
+    this.scale.start((weight) => {
+        this.weight = weight;
+        this.error = null;
+        this.message = null;
+        Object.values(this.observes)
+            .forEach(o => o.onSuccess(weight))
+    }, (error, message) => {
+        this.weight = null;
+        this.error = error;
+        this.message = message;
+        Object.values(this.observes)
+            .forEach(o => o.onError(error, message))
+    })
+}
+
+ScaleController.prototype.registObserve = function(name, obs){
+    this.observes[name] = obs;
+}
+
+ScaleController.prototype.removeObserve = function(name){
+    this.observes = delete this.observes[name]
+}
+
+
+module.exports = function (context) { 
+    return new ScaleController(context);
+};
