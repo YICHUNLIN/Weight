@@ -2,8 +2,18 @@
  * @description 新增過磅紀錄
  */
 module.exports = function(context){
-    const {} = context.controller;
+    const {ScaleObserveController} = context.controller;
     const {Record, Scale, Config} = context.models;
+    const {} = context.models;
+    let ERROR = null;
+    let DATA = null;
+    ScaleObserveController.regist("API-GET[/cfg/scale]", (err) => {
+        ERROR = err;
+        DATA = null;
+    }, (data) => {
+        DATA = data;
+        ERROR = null;
+    })
     return [
         (req, res, next) => {
             // 貨物名稱
@@ -43,17 +53,13 @@ module.exports = function(context){
             delete req.body.id;
             req.body.createdBy = req.loginState.id;
             const scale_enable = Config.getConfig("SCALE_ENABLE");
+            if (!scale_enable.value){
+                req.body.scaleInfo = {ERROR,DATA}
+            }
             Record.create(req.body)
                 .then(
                     ({id, date}) =>{
-                        if (!scale_enable.value) 
-                            return res.status(200).json({code: 200, id, date, message: 'create record successed, without chunk!'})
-                        return Scale.getData()
-                                    .then(chunk => 
-                                        Record.saveChunk(id, date, chunk)
-                                            .then(r => res.status(200).json({code: 200, id, date, message: 'create record successed, with chunk!'}))
-                                    )
-                                    .catch(err => res.status(200).json({code: 200, id, date, message: 'create record successed, without chunk!'}))
+                        return res.status(200).json({code: 200, id, date, scale: {DATA,ERROR}})
                     }             
                 )
                 .catch(err => res.status(400).json({code: 400, err}))

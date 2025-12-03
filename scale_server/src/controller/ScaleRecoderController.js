@@ -5,13 +5,19 @@ function ScaleRecoderController(context){
     const {Config} = context.models;
     this.COM_PORT = Config.getConfig("SCALE_COM_PORT").value
     this.BAUD_RATE = Config.getConfig("SCALE_BAUD_RATE").value
+    this.SCALE_DATABITS = Config.getConfig("SCALE_DATABITS").value
+    this.SCALE_STOPBIT = Config.getConfig("SCALE_STOPBIT").value
+    this.SCALE_PARITY = Config.getConfig("SCALE_PARITY").value
 }
 
 ScaleRecoderController.prototype.start = function(onData, onError, onOpen){
-    console.log(`[RS-232] 嘗試連接埠 ${this.COM_PORT} (Baud: ${this.BAUD_RATE})...`);
+    console.log(`[RS-232] 嘗試連接埠 ${this.COM_PORT} (Baud: ${this.BAUD_RATE},DataBits:${this.SCALE_DATABITS},StopBit:${this.SCALE_STOPBIT},Parity:${this.SCALE_PARITY})...`);
     this.port = new SerialPort({
         path: this.COM_PORT,
         baudRate: parseInt(this.BAUD_RATE),
+        dataBits: parseInt(this.SCALE_DATABITS),
+        parity: this.SCALE_PARITY,
+        stopBits: this.SCALE_STOPBIT,
     }, (err) => {
         if (err) {
             console.error(`[!] 錯誤: 無法開啟連接埠: ${err.message}`);
