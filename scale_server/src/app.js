@@ -8,8 +8,9 @@ const Auth = require('./utils/auth')
 const MContext = require('./context');
 const context = new MContext();
 const {Config} = context.models;
-const {ScaleObserveController} = context.controller;
+const {ScaleObserveController, RFIDObserveController} = context.controller;
 ScaleObserveController.start(() => { console.log(`ScaleObserveController is opening...`)});
+RFIDObserveController.start();
 const objectServer = require('./utils/ObjectServer')({
     clientId: Config.getConfig("AUTH_CLIENT_ID").value, 
     secret: Config.getConfig("AUTH_CLIENT_SECRET").value,
@@ -19,6 +20,7 @@ const objectServer = require('./utils/ObjectServer')({
 })
 console.log("AUTH SERVER=",Config.getConfig("AUTH_SERVER").value)
 console.log("AUTH ACCOUNT=",Config.getConfig("AUTH_CLIENT_USER_ACCOUNT").value)
+
 var app = express();
 
 app.use(cookieParser());
