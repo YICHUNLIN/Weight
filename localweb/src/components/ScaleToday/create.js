@@ -213,11 +213,15 @@ const initFormData = {
     desc: "",
     client: ""
   };
-export default function Create({onUpdate, items, dc}) {
+export default function Create({onUpdate, items, dc, scaleState}) {
   const [formData, setFormData] = React.useState(initFormData);
 
   const contextValue = React.useMemo(() => ({ formData, setFormData }), [formData]);
-
+  useEffect(() => {
+    if ((scaleState.isStable === true) && (!scaleState.error)){
+      setFormData({...formData, number: scaleState.weight})
+    }
+  }, [scaleState])
   return (
     <FormContext.Provider value={contextValue}>
       <DialogsProvider>

@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import {Table,TableHead,TableRow,TableCell,TableBody, Tooltip, Button} from '@mui/material';
+import {Table,TableHead,TableRow,TableCell,TableBody, Tooltip, Button, Typography, Card, CardContent} from '@mui/material';
 import { PageContainer,PageHeaderToolbar } from '@toolpad/core/PageContainer';
 import Create from './create';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import { useGlobalContext } from '../../storage/context';
 import Update from './update';
 import { GetUsers } from '../../action/auth';
-import { GetDailyConfig, GetItems } from '../../action/cfg';
+import { GetDailyConfig, GetItems, GetScale } from '../../action/cfg';
 import DeleteDialog from './delete';
 
 const ActionOptios = ({d, user, onUpdate, onDelete, items}) => {
@@ -22,6 +22,27 @@ const ActionOptios = ({d, user, onUpdate, onDelete, items}) => {
   </TableCell>
 }
 
+const Status = ({scaleState}) => {
+  if (scaleState.error)
+    return <Card style={{ backgroundColor: "red" }}>
+      <CardContent>
+        <Typography  sx={{ color: 'text.secondary', fontSize: 20 }}>
+          取得地磅資料失敗
+        </Typography>
+      </CardContent>
+    </Card>
+  return <Card sx={{ minWidth: 275 }} style={{ backgroundColor: scaleState.isStable === true ? "green" : "red" }}>
+      <CardContent>
+        <Typography  sx={{ color: 'text.secondary', fontSize: 20 }}>
+          地磅狀態
+        </Typography>
+        <Typography variant="h5" component="div">
+          {scaleState.weight} {scaleState.unit}
+        </Typography>
+      </CardContent>
+    </Card>
+}
+
 
 function ScaleToday({ pathname }) {
   const [{scale, auth: {user}}, dispatch] = useGlobalContext()
@@ -30,6 +51,7 @@ function ScaleToday({ pathname }) {
   const [users, setUsers] = useState({})
   const [items, setItems] = useState([])
   const [dc, setDailyConfig] = useState({})
+  const [scaleState, setScaleState] = useState({})
 
   const getData = () => {
     findDataByDate(today)
@@ -51,16 +73,28 @@ function ScaleToday({ pathname }) {
     GetItems()
       .then(setItems)
       .catch(console.log)
+    setInterval(() => {
+      GetScale()
+        .then(s => {
+          setScaleState(s.data);
+        })
+        .catch(err => {
+          console.log(err)
+          setScaleState({error: '取得地磅資料失敗!'});
+        })
+    }, 1000)
   }, [])
   return (<PageContainer title={today}>
       <PageHeaderToolbar>
         <Create 
           dc={dc}
           items={items}
+          scaleState={scaleState}
           onUpdate={e => {
             getData()
           }}/>
       </PageHeaderToolbar>
+      <Status scaleState={scaleState}/>
       <Table>
           <TableHead>
               <TableRow>

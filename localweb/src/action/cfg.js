@@ -61,3 +61,19 @@ export const GetAppName = () => {
             .catch(reject)
     })
 }
+
+//取得地磅資料
+export const GetScale = () => {
+    const ticket = localStorage.getItem('ticket');
+    const config ={
+        headers: {
+            'authorization-client': `Basic ${CLIENT_SECRET}`,
+            'authorization': `Bearer ${ticket}`
+        }
+    }
+    return new Promise((resolve, reject) => {
+        axios.get(`${getScaleURL()}/api/cfg/scale`, config)
+            .then(r => resolve(r.data.data))
+            .catch(reject)
+    })
+}
