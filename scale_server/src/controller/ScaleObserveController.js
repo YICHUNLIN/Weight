@@ -70,10 +70,6 @@ ScaleObserveController.prototype.parseScaleData = function(str) {
     let weight = parseFloat(match[1]);
     const unit = match[2];
 
-    // [注意] 這裡假設地磅是兩位小數 (142.60)，請根據實際螢幕顯示調整除數！
-    // 如果螢幕是 14.260，請改除以 1000
-    weight = weight / 100; 
-
     return {
       status: status,      // ST=穩定, US=不穩, OL=過載
       mode: mode,          // GS=毛重, NT=淨重
