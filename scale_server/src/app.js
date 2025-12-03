@@ -9,7 +9,7 @@ const MContext = require('./context');
 const context = new MContext();
 const {Config} = context.models;
 const {ScaleObserveController} = context.controller;
-ScaleObserveController.start();
+ScaleObserveController.start(() => { console.log(`ScaleObserveController is opening...`)});
 const objectServer = require('./utils/ObjectServer')({
     clientId: Config.getConfig("AUTH_CLIENT_ID").value, 
     secret: Config.getConfig("AUTH_CLIENT_SECRET").value,
