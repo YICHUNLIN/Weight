@@ -15,7 +15,11 @@ module.exports = function(context){
     })
     return [
         (req, res) => {
-            res.status(200).json({code: 200, error: ERROR, data: DATA})
+            if (ERROR){
+                res.status(400).json({code: 400, error: ERROR})
+            } else {
+                res.status(200).json({code: 200, data: DATA})
+            }
         }
     ]
 };
