@@ -23,14 +23,12 @@ Ws.prototype.registNotifyServices = function(){
     ScaleObserveController.regist("WS-NOTIFY", (err) => {
         Object.values(this.sockets).forEach(s => s.emit('on_scale_err', err))
     }, (data) => {
-        console.log(data)
         Object.values(this.sockets).forEach(s => s.emit('on_scale', data))
     })
 
     RFIDObserveController.regist("WS-NOTIFY", (err) => {
         Object.values(this.sockets).forEach(s => s.emit('on_rfid_err', err))
     }, (data) => {
-        console.log(data)
         Object.values(this.sockets).forEach(s => s.emit('on_rfid', data))
     })
 }
