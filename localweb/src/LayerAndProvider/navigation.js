@@ -7,7 +7,7 @@ import TodayIcon from '@mui/icons-material/Today';
 import ScaleIcon from '@mui/icons-material/Scale';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CategoryIcon from '@mui/icons-material/Category';
-import SettingsSystemDaydreamIcon from '@mui/icons-material/SettingsSystemDaydream';
+import LabelImportantOutlineIcon from '@mui/icons-material/LabelImportantOutline';
 const NAVIGATION = [
   {
     kind: 'header',
@@ -23,6 +23,12 @@ const NAVIGATION = [
         icon: <TodayIcon />,
         title: '本日資料',
         pattern: 'today/:date'
+      },
+      {
+        segment: 'importmode',
+        icon: <LabelImportantOutlineIcon />,
+        title: '進料模式',
+        pattern: 'import/:date'
       },
       {
         segment: 'history',

@@ -7,6 +7,7 @@ import ItemSetting from "../components/ItemSetting";
 import DeletedData from "../components/DeletedData";
 import { useContext } from "react";
 import { AppContext } from "../storage/context";
+import ImportMode from "../components/ImportMode";
 const routes = [
     {
         path: '/',
@@ -29,6 +30,10 @@ const routes = [
         path: '/setting/items',
         allow: 'SCALE_SETTING_CONFIG',
         component: <ItemSetting/>
+    },
+    {
+        path: '/scale/importmode',
+        component: <ImportMode/>
     }
 ]
 
