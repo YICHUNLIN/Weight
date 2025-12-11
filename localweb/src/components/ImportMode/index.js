@@ -2,7 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { PageContainer,PageHeaderToolbar } from '@toolpad/core/PageContainer';
-import { Box, Button, Table, TableBody, TableCell, TableHead, TableRow, Typography,Card, CardContent } from '@mui/material';
+import { Box, Button, Table, TableBody, TableCell, TableHead, TableRow, Typography,Card, CardContent, FormControlLabel } from '@mui/material';
 import { useEffect,useState } from 'react';
 import OptSelect from '../com/OptSelect';
 import { GetDailyConfig, GetItems,GetScale } from '../../action/cfg';
@@ -11,8 +11,17 @@ import DefaultValues from './defaultValues';
 import OptFields from './optFields';
 import { createRecord } from '../../action/scale';
 import { GetUsers } from '../../action/auth';
-
-
+import Checkbox from '@mui/material/Checkbox';
+import Update from './update';
+import DeleteDialog from './delete'
+import { useGlobalContext } from '../../storage/context';
+const ActionOptios = ({d, user, onUpdate, onDelete, items}) => {
+  return <TableCell>
+    
+    {d.createdBy === user.id ? <Update value={d} onUpdate={onUpdate} items={items}/> : ""}
+    {d.createdBy === user.id ? <DeleteDialog onDelete={onDelete}/> : ""}
+  </TableCell>
+}
 const defaultV = {
     item: "",
     inorout: "INPORT",
@@ -27,6 +36,20 @@ const initFormData = {
     desc: "",
     carInfo: true
   };
+
+const AutoScale = ({onChange, value}) => {
+  return <FormControlLabel
+    label="自動輸入總重?"
+    control={
+      <Checkbox
+        checked={value}
+        onChange={e => {
+          onChange(e.target.checked)
+        }}
+      />
+    }
+  />
+}
 
 const Status = ({scaleState}) => {
   if (scaleState.error)
@@ -49,6 +72,7 @@ const Status = ({scaleState}) => {
     </Card>
 }
 function ImportMode({ pathname }) {
+  const [{scale, auth: {user}}, dispatch] = useGlobalContext()
   const [carInfo, setCarInfo] = useState({})
   const [defalutValue, setDefaultValue] = useState(defaultV)
   const [formData, setFormData] = React.useState(initFormData);
@@ -57,21 +81,26 @@ function ImportMode({ pathname }) {
   const [today] = useState((new Date()).toISOString().split('T')[0])
   const [scaleState, setScaleState] = useState({})
   const [list, setList] = useState([]);
+  const [isAutoGetWeight, setIsAutoGetWeight] = useState(true);
+  const [items, setItems] = useState([])
   const getData = () => {
         findDataByDate(today)
           .then(setList)
           .catch(console.log)
   }
+  useEffect(() => {
+      GetItems()
+      .then(setItems)
+      .catch(console.log)
+  }, [])
 
   useEffect(() => {
-
     GetUsers()
       .then(us => setUsers(us.reduce((map, u) => ({...map, [u.id]:u}), {})))
       .catch(console.log)
     setInterval(() => {
       GetScale()
         .then(s => {
-          setFormData({number: s.weight})
           setScaleState(s.data);
         })
         .catch(err => {
@@ -106,21 +135,26 @@ function ImportMode({ pathname }) {
 
   return (<PageContainer  >
     <PageHeaderToolbar>
-      <DefaultValues fd={defalutValue} onUpdate={e => onUpdateDefaultValues(e)}/>
-      <OptFields fd={formData} onUpdate={e => {
-        if (e.car){
-          const key = "IMPORT_MODE_CAR_INFO";
-          let storageValue = getStorageInfo(key);
-          if (storageValue.hasOwnProperty(e.car)) 
-            e = {...e, ...storageValue[e.car]};
-        }
-        setFormData({...formData, ...e})
-      }} scaleStat={scaleState}/>
+      <AutoScale value={isAutoGetWeight} onChange={e => setIsAutoGetWeight(e)}/>
+    </PageHeaderToolbar>
+    <PageHeaderToolbar>
+      <DefaultValues fd={defalutValue} items={items} onUpdate={e => onUpdateDefaultValues(e)}/>
+      <OptFields fd={formData} 
+        autoScale={isAutoGetWeight}
+        onUpdate={e => {
+          if (e.car){
+            const key = "IMPORT_MODE_CAR_INFO";
+            let storageValue = getStorageInfo(key);
+            if (storageValue.hasOwnProperty(e.car)) 
+              e = {...e, ...storageValue[e.car]};
+          }
+          setFormData({...formData, ...e})
+        }} scaleStat={scaleState}/>
     </PageHeaderToolbar>
     <PageHeaderToolbar>
       <Button onClick={e => {
         onUpdateCarInfo({[formData.car]: {empty: formData.empty, driver: formData.driver}})
-        createRecord({...formData,...defalutValue, mode: 'IMPORT'})
+        createRecord({...formData,...defalutValue, mode: 'INPORT'})
           .then(r => {
             setFormData(initFormData);
             getData();
@@ -140,11 +174,12 @@ function ImportMode({ pathname }) {
                 <TableCell>車輛/司機</TableCell>
                 <TableCell>時間</TableCell>
                 <TableCell>紀錄者</TableCell>
+                <TableCell></TableCell>
             </TableRow>
         </TableHead>
         <TableBody>
            {
-              list.map((d, i) => <TableRow key={`data_row_${i}`} >
+              list.filter(d => d.mode === "INPORT").map((d, i) => <TableRow key={`data_row_${i}`} >
                 <TableCell>{i+1}</TableCell>
                 <TableCell style={{ backgroundColor: d.inorout !== "INPORT" ? "#ff8400ff" : "#14cc76ff" }} >
                   {d.inorout === "INPORT" ? "進場" : "出場"}
@@ -156,7 +191,16 @@ function ImportMode({ pathname }) {
                 <TableCell>{d.car} / {d.driver}</TableCell>
                 <TableCell>{ (new Date(d.createdAt)).toLocaleTimeString()}</TableCell>
                 <TableCell>{!users.hasOwnProperty(d.createdBy) ? "---" : users[d.createdBy].account}</TableCell>
-                
+                <ActionOptios 
+                  d={d} 
+                  user={user}
+                  onDelete={() => {
+                    deleteRecord(d.createdAt.split('T')[0],d.id)
+                      .then(r => getData())
+                      .catch(console.log)
+                  }}
+                  onUpdate={e => getData()} 
+                  items={items}/>
               </TableRow>)
             }
         </TableBody>
