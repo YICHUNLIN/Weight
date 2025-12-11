@@ -9,11 +9,11 @@ const Auth = require('./utils/auth')
 const MContext = require('./context');
 const context = new MContext();
 const {Config} = context.models;
-const {ScaleObserveController} = context.controller;
+const {ScaleObserveController, RFIDObserveController} = context.controller;
 
 //const WS = require('./Ws');
 ScaleObserveController.start(() => { console.log(`ScaleObserveController is opening...`)});
-//RFIDObserveController.start();
+RFIDObserveController.start();
 const objectServer = require('./utils/ObjectServer')({
     clientId: Config.getConfig("AUTH_CLIENT_ID").value, 
     secret: Config.getConfig("AUTH_CLIENT_SECRET").value,
