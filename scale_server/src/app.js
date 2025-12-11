@@ -11,7 +11,7 @@ const context = new MContext();
 const {Config} = context.models;
 const {ScaleObserveController, RFIDObserveController} = context.controller;
 
-const WS = require('./Ws');
+//const WS = require('./Ws');
 ScaleObserveController.start(() => { console.log(`ScaleObserveController is opening...`)});
 RFIDObserveController.start();
 const objectServer = require('./utils/ObjectServer')({
@@ -29,11 +29,11 @@ var app = express();
 app.set('port', process.env.PORT);
 
 var server = http.createServer(app);
-const ws = new WS(server, context);
+//const ws = new WS(server, context);
 app.use(cookieParser());
 app.use(logger('dev'));
 require('./utils/passport')(passport, objectServer);
-app.use(ws.mid())
+//app.use(ws.mid())
 
 const auth = new Auth();
 app.use(function(req, res, next) {
