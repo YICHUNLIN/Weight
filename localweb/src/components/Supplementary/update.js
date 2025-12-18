@@ -22,7 +22,7 @@ function TransactionDialog({ payload, open, onClose }) {
   const { formData } = useFormContext();
     useEffect(() => {
       const fields = ['empty', 'item', 'inorout', 'source_or_destination', 
-        'client', 'car', 'client'];
+        'client', 'car', 'client', 'ptime'];
       if (fields.filter(f => formData.hasOwnProperty(f) && (formData[f] !== "") && (typeof formData[f] !== 'number' ? true : (formData[f] !== 0))).length === fields.length){
         setEnable(true)
       }else {
@@ -41,7 +41,7 @@ function TransactionDialog({ payload, open, onClose }) {
           onClick={async () => {
             setLoading(true);
             try {
-              updateRecord(formData.createdAt.split('T')[0], formData.id, formData)
+              updateRecord(formData.date, formData.id, formData)
                 .then(r => onClose(r))
                 .catch(console.log)
             } finally {
@@ -103,7 +103,12 @@ function RecordForms({items}) {
             <ListItem>
                 <InOutSelect onChange={value =>setFormData({...formData, inorout: value})}/>
             </ListItem>
+
             <ListItem>
+              <TextField type='time' 
+                    value={formData.ptime}
+                    variant='standard'
+                    onChange={e => Update({ ptime: e.target.value})}/>
             </ListItem>
             <ListItem>
                 <TextField
@@ -196,7 +201,9 @@ const initFormData = {
     driver: "",
     car: "",
     desc: "",
-    client: ""
+    client: "",
+    ptime: '',
+    mode: 'supplementary'
   };
 export default function Update({value, onUpdate, items}) {
   const [formData, setFormData] = React.useState(initFormData);

@@ -15,13 +15,19 @@ import { GetDailyConfig, GetItems, GetScale } from '../../action/cfg';
 import DeleteDialog from './delete';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-
-const Content = ({date, data, users}) => {
+const ActionOptios = ({d, user, onUpdate, onDelete, items}) => {
+  return <TableCell>
+    {d.createdBy === user.id ? <Update value={d} onUpdate={onUpdate} items={items}/> : ""}
+    {d.createdBy === user.id ? <DeleteDialog onDelete={onDelete}/> : ""}
+  </TableCell>
+}
+const Content = ({date, data, items, users, getData, onUpdate}) => {
+  const [{scale, auth: {user}}, dispatch] = useGlobalContext()
   const [open, setOpen] = useState(true)
-  useEffect(() => console.log(data), [data])
+  useEffect(() => console.log(users), [users])
   return <>
     <TableRow>
-      <TableCell colSpan={10}>
+      <TableCell colSpan={11}>
         {date}
         <Button onClick={e => setOpen(!open)}>
           {open ? <ArrowDropDownIcon/> : <ArrowDropUpIcon/>}
@@ -42,6 +48,16 @@ const Content = ({date, data, users}) => {
         <TableCell>{d.ptime}</TableCell>
         <TableCell>{d.createdAt}</TableCell>
         <TableCell>{!users.hasOwnProperty(d.createdBy) ? "---" : users[d.createdBy].account}</TableCell>
+        <ActionOptios 
+          d={d} 
+          user={user}
+          onDelete={() => {
+            deleteRecord(d.date,d.id)
+              .then(r => getData())
+              .catch(console.log)
+          }}
+          onUpdate={e => getData()} 
+          items={items}/>
       </TableRow>) : ''
     }
   </>
@@ -97,6 +113,7 @@ function Supplementary({ pathname }) {
                   <TableCell>事件時間</TableCell>
                   <TableCell>補件時間</TableCell>
                   <TableCell>紀錄者</TableCell>
+                  <TableCell></TableCell>
               </TableRow>
           </TableHead>
           <TableBody>
@@ -106,6 +123,8 @@ function Supplementary({ pathname }) {
                                 key={`${date}_row_content`} 
                                 date={date} 
                                 users={users}
+                                items={items}
+                                getData={getData}
                                 data={data[date]}/>)
             }
           </TableBody>

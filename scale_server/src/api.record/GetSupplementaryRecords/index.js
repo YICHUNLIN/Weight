@@ -8,7 +8,6 @@ module.exports = function(context){
         (req, res) => {
             Record.findSupplementary()
                 .then(d => {
-                    console.log(d)
                     res.status(200).json({code: 200, data: d});
                 })
                 .catch(err => {
