@@ -108,7 +108,7 @@ function RecordForms({items}) {
               <TextField type='time' 
                     value={formData.ptime}
                     variant='standard'
-                    onChange={e => Update({ ptime: e.target.value})}/>
+                    onChange={e => setFormData({ ...formData,ptime: e.target.value})}/>
             </ListItem>
             <ListItem>
                 <TextField
