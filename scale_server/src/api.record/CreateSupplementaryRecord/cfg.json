@@ -1,0 +1,8 @@
+{
+    "name":"/supplementary/:date",
+    "method": "post",
+    "auth": true,
+    "pms":["SCALE_CREATE_RECORD"],
+    "desc": "補過磅紀錄",
+    "index": "index.js"
+}

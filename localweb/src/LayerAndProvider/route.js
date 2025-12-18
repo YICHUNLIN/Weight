@@ -8,6 +8,8 @@ import DeletedData from "../components/DeletedData";
 import { useContext } from "react";
 import { AppContext } from "../storage/context";
 import ImportMode from "../components/ImportMode";
+import DailyConfig from "../components/DailyConfigs";
+import Supplementary from "../components/Supplementary";
 const routes = [
     {
         path: '/',
@@ -22,6 +24,10 @@ const routes = [
         component: <History/>
     },
     {
+        path: '/scale/supplementary',
+        component: <Supplementary/>
+    },
+    {
         path: '/scale/deleted',
         allow: 'SCALE_MAMAGE_DELETE',
         component: <DeletedData/>
@@ -34,6 +40,10 @@ const routes = [
     {
         path: '/scale/importmode',
         component: <ImportMode/>
+    },
+    {
+        path: '/scale/dailyconfig',
+        component: <DailyConfig/>
     }
 ]
 

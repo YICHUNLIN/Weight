@@ -43,6 +43,21 @@ export const getRangeRecord = (start, end) => {
     })
 }
 
+export const createSupplementary = (date, data) => {
+    const ticket = localStorage.getItem('ticket');
+    const config ={
+        headers: {
+            'authorization-client': `Basic ${CLIENT_SECRET}`,
+            'authorization': `Bearer ${ticket}`
+        }
+    }
+    return new Promise((resolve, reject) => {
+        axios.post(`${getScaleURL()}/api/record/supplementary/${date}`, data, config)
+            .then(resolve)
+            .catch(err => reject(err))
+    })
+}
+
 export const createRecord = (data) => {
     const ticket = localStorage.getItem('ticket');
     const config ={
