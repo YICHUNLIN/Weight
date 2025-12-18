@@ -8,6 +8,7 @@ import ScaleIcon from '@mui/icons-material/Scale';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CategoryIcon from '@mui/icons-material/Category';
 import LabelImportantOutlineIcon from '@mui/icons-material/LabelImportantOutline';
+import PostAddIcon from '@mui/icons-material/PostAdd';
 const NAVIGATION = [
   {
     kind: 'header',
@@ -25,10 +26,20 @@ const NAVIGATION = [
         pattern: 'today/:date'
       },
       {
+        segment: 'supplementary',
+        icon: <PostAddIcon />,
+        title: '補資料'
+      },
+      {
         segment: 'importmode',
         icon: <LabelImportantOutlineIcon />,
         title: '進料模式',
         pattern: 'import/:date'
+      },
+      {
+        segment: 'dailyconfig',
+        icon: <SettingsIcon />,
+        title: '每日空車重'
       },
       {
         segment: 'history',

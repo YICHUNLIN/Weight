@@ -46,6 +46,25 @@ Record.prototype.create = function(data){
     })
 }
 
+/**
+ * @description 新增補件資料
+ * @param {*} date 
+ * @param {*} data 
+ * @returns 
+ */
+Record.prototype.createSupplementary = function(date, data){
+    return new Promise((resolve, reject) => {
+        const time = new Date();
+        const p = `${this.path}/${date}`;
+        if (!fs.existsSync(p))
+            fs.mkdirSync(p)
+        const d = {id: time.getTime(),...data,time:data.ptime, createdAt: time};
+        fs.mkdirSync(`${p}/${d.id}`)
+        fs.writeFileSync(`${p}/${d.id}/metadata.json`, JSON.stringify([d]))
+        return resolve({id: d.id, date});
+    })
+}
+
 
 Record.prototype.saveChunk = function(id, date, data) {
     return new Promise((resolve, reject) => {
