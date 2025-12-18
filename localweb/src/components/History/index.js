@@ -10,6 +10,16 @@ import { GetUsers } from '../../action/auth';
 import { XLSX_write_ForRangeRecordsBydate } from '../com/ExportExcel';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+
+const modeMap = (m) => {
+  const modes = {
+    "supplementary": "補件",
+    "IMPORT":"進料"
+  }
+  if (modes.hasOwnProperty(m)) return modes[m];
+  return ""
+}
+
 const Content = ({date, data, users}) => {
   const [open, setOpen] = useState(true)
   return <>
@@ -32,7 +42,8 @@ const Content = ({date, data, users}) => {
         <TableCell>{d.number}</TableCell>
         <TableCell>{d.empty}</TableCell>
         <TableCell>{d.car} / {d.driver}</TableCell>
-        <TableCell>{ (new Date(d.createdAt)).toLocaleTimeString()}</TableCell>
+        <TableCell>{ d.mode !== "supplementary" ? (new Date(d.createdAt)).toLocaleTimeString() : d.ptime}</TableCell>
+        <TableCell>{ modeMap(d.mode)}</TableCell>
         <TableCell>{!users.hasOwnProperty(d.createdBy) ? "---" : users[d.createdBy].account}</TableCell>
       </TableRow>) : ''
     }
@@ -110,7 +121,8 @@ function History({ pathname }) {
                   <TableCell>總重</TableCell>
                   <TableCell>空車重</TableCell>
                   <TableCell>車輛/司機</TableCell>
-                  <TableCell>時間</TableCell>
+                  <TableCell>事件時間</TableCell>
+                  <TableCell>輸入模式</TableCell>
                   <TableCell>紀錄者</TableCell>
               </TableRow>
           </TableHead>

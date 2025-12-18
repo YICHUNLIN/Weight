@@ -19,6 +19,25 @@ export const findDataByDate = (date) => {
     })
 }
 
+
+export const getSupplementaryData = () => {
+    const ticket = localStorage.getItem('ticket');
+    const config ={
+        headers: {
+            'authorization-client': `Basic ${CLIENT_SECRET}`,
+            'authorization': `Bearer ${ticket}`
+        }
+    }
+    return new Promise((resolve, reject) => {
+        axios.get(`${getScaleURL()}/api/record/supplementary`, config)
+            .then(r => {
+                const d = r.data.data;
+                resolve(d)
+            })
+            .catch(err => reject(err))
+    })
+}
+
 /**
  * @description 取得一個range的紀錄
  * @param {*} start 

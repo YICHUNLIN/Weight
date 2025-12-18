@@ -26,21 +26,21 @@ const NAVIGATION = [
         pattern: 'today/:date'
       },
       {
-        segment: 'supplementary',
-        icon: <PostAddIcon />,
-        title: '補資料'
-      },
-      {
         segment: 'importmode',
         icon: <LabelImportantOutlineIcon />,
         title: '進料模式',
         pattern: 'import/:date'
       },
       {
-        segment: 'dailyconfig',
-        icon: <SettingsIcon />,
-        title: '每日空車重'
+        segment: 'supplementary',
+        icon: <PostAddIcon />,
+        title: '補資料'
       },
+      // {
+      //   segment: 'dailyconfig',
+      //   icon: <SettingsIcon />,
+      //   title: '每日空車重'
+      // },
       {
         segment: 'history',
         icon: <FormatListNumberedIcon />,

@@ -1,0 +1,8 @@
+{
+    "name":"/supplementary",
+    "method": "get",
+    "auth": true,
+    "pms":["SCALE_USE_LOCAL_CLIENT"],
+    "desc": "取得補資料的過磅紀錄?date=",
+    "index": "index.js"
+}

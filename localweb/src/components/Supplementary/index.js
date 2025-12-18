@@ -6,45 +6,66 @@ import { PageContainer,PageHeaderToolbar } from '@toolpad/core/PageContainer';
 import Create from './create';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { useState } from 'react';
-import { findDataByDate, deleteRecord } from '../../action/scale';
+import { findDataByDate, deleteRecord, getSupplementaryData } from '../../action/scale';
 import { useEffect } from 'react';
 import { useGlobalContext } from '../../storage/context';
 import Update from './update';
 import { GetUsers } from '../../action/auth';
 import { GetDailyConfig, GetItems, GetScale } from '../../action/cfg';
 import DeleteDialog from './delete';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 
-const ActionOptios = ({d, user, onUpdate, onDelete, items}) => {
-  return <TableCell>
-    
-    {d.createdBy === user.id ? <Update value={d} onUpdate={onUpdate} items={items}/> : ""}
-    {d.createdBy === user.id ? <DeleteDialog onDelete={onDelete}/> : ""}
-  </TableCell>
+const Content = ({date, data, users}) => {
+  const [open, setOpen] = useState(true)
+  useEffect(() => console.log(data), [data])
+  return <>
+    <TableRow>
+      <TableCell colSpan={10}>
+        {date}
+        <Button onClick={e => setOpen(!open)}>
+          {open ? <ArrowDropDownIcon/> : <ArrowDropUpIcon/>}
+        </Button> 
+      </TableCell>
+    </TableRow>
+    {
+      open ? data.map((d, i) => <TableRow key={`${date}_${i}`}>
+        <TableCell>{i+1} )</TableCell>
+        <TableCell style={{ backgroundColor: d.inorout !== "INPORT" ? "#ff8400ff" : "#14cc76ff" }} >
+          {d.inorout === "INPORT" ? "進場" : "出場"}
+        </TableCell>
+        <TableCell>{d.client} / {d.source_or_destination}</TableCell>
+        <TableCell>{d.item} / {d.desc}</TableCell>
+        <TableCell>{d.number}</TableCell>
+        <TableCell>{d.empty}</TableCell>
+        <TableCell>{d.car} / {d.driver}</TableCell>
+        <TableCell>{d.ptime}</TableCell>
+        <TableCell>{d.createdAt}</TableCell>
+        <TableCell>{!users.hasOwnProperty(d.createdBy) ? "---" : users[d.createdBy].account}</TableCell>
+      </TableRow>) : ''
+    }
+  </>
 }
-
 
 
 function Supplementary({ pathname }) {
   const [{scale, auth: {user}}, dispatch] = useGlobalContext()
   const [today] = useState((new Date()).toISOString().split('T')[0])
-  const [data, setData] = useState([])
+  const [data, setData] = useState({})
   const [users, setUsers] = useState({})
   const [items, setItems] = useState([])
   const [dc, setDailyConfig] = useState({})
   const [scaleState, setScaleState] = useState({})
 
   const getData = () => {
-    findDataByDate(today)
+    getSupplementaryData()
       .then(setData)
-      .catch(console.log)
-    GetDailyConfig(today)
-      .then(setDailyConfig)
       .catch(console.log)
   }
 
   useEffect(() => {
     getData()
-  }, [today])
+  }, [])
 
   useEffect(() => {
     GetUsers()
@@ -53,16 +74,6 @@ function Supplementary({ pathname }) {
     GetItems()
       .then(setItems)
       .catch(console.log)
-    setInterval(() => {
-      GetScale()
-        .then(s => {
-          setScaleState(s.data);
-        })
-        .catch(err => {
-          console.log(err)
-          setScaleState({error: '取得地磅資料失敗!'});
-        })
-    }, 1000)
   }, [])
   return (<PageContainer title={today}>
       <PageHeaderToolbar>
@@ -83,36 +94,19 @@ function Supplementary({ pathname }) {
                   <TableCell>總重</TableCell>
                   <TableCell>空車重</TableCell>
                   <TableCell>車輛/司機</TableCell>
-                  <TableCell>時間</TableCell>
+                  <TableCell>事件時間</TableCell>
+                  <TableCell>補件時間</TableCell>
                   <TableCell>紀錄者</TableCell>
-                  <TableCell></TableCell>
               </TableRow>
           </TableHead>
           <TableBody>
             {
-              data.map((d, i) => <TableRow key={`data_row_${i}`} >
-                <TableCell>{i+1}</TableCell>
-                <TableCell style={{ backgroundColor: d.inorout !== "INPORT" ? "#ff8400ff" : "#14cc76ff" }} >
-                  {d.inorout === "INPORT" ? "進場" : "出場"}
-                </TableCell>
-                <TableCell>{d.client} / {d.source_or_destination}</TableCell>
-                <TableCell>{d.item} / {d.desc}</TableCell>
-                <TableCell>{d.number}</TableCell>
-                <TableCell>{d.empty}</TableCell>
-                <TableCell>{d.car} / {d.driver}</TableCell>
-                <TableCell>{ (new Date(d.createdAt)).toLocaleTimeString()}</TableCell>
-                <TableCell>{!users.hasOwnProperty(d.createdBy) ? "---" : users[d.createdBy].account}</TableCell>
-                <ActionOptios 
-                  d={d} 
-                  user={user}
-                  onDelete={() => {
-                    deleteRecord(d.createdAt.split('T')[0],d.id)
-                      .then(r => getData())
-                      .catch(console.log)
-                  }}
-                  onUpdate={e => getData()} 
-                  items={items}/>
-              </TableRow>)
+              Object.keys(data)
+                .map(date => <Content 
+                                key={`${date}_row_content`} 
+                                date={date} 
+                                users={users}
+                                data={data[date]}/>)
             }
           </TableBody>
       </Table>

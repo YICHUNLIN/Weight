@@ -23,7 +23,7 @@ function TransactionDialog({ payload, open, onClose }) {
   const { formData } = useFormContext();
   useEffect(() => {
     const fields = ['empty', 'item', 'inorout', 'source_or_destination', 
-      'client', 'car', 'client'];
+      'client', 'car', 'client', 'date', 'ptime'];
     if (fields.filter(f => formData.hasOwnProperty(f) && (formData[f] !== "") && (typeof formData[f] !== 'number' ? true : (formData[f] !== 0))).length === fields.length){
       setEnable(true)
     }else {
@@ -42,7 +42,7 @@ function TransactionDialog({ payload, open, onClose }) {
           onClick={async () => {
             setLoading(true);
             try {
-              createSupplementary(formData)
+              createSupplementary(formData.date, formData)
                 .then(r => {
                   onClose(formData);
                 })
@@ -183,9 +183,6 @@ function RecordForms({items, dc}) {
                     onChange={e => Update({ empty: parseInt(e.target.value)})}
                     type='number'/>
             </ListItem>
-            <ListItem>
-              <CheckOptions onCheck={cs => Update({config: cs})}/>
-            </ListItem>
         </List>
   );
 }
@@ -219,7 +216,8 @@ const initFormData = {
     desc: "",
     client: "",
     date: "",
-    ptime: ""
+    ptime: "",
+    mode: 'supplementary'
   };
 export default function Create({onUpdate, items, dc}) {
   const [formData, setFormData] = React.useState(initFormData);

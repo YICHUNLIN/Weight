@@ -131,6 +131,28 @@ Record.prototype.find = function(query){
     })
 }
 
+Record.prototype.findSupplementary = function() {
+    return new Promise((resolve, reject) => {
+        const result = fs.readdirSync(this.path)
+            .reduce((map, date) => {
+                const p = `${this.path}/${date}`
+                const d = fs.readdirSync(p)
+                    .map(file => JSON.parse(fs.readFileSync(`${p}/${file}/metadata.json`)))
+                    .filter(d => {
+                        const last = d[d.length - 1];
+                        if (last.hasOwnProperty("tags") && last.tags.includes("delete")) 
+                            return false;
+                        if (last.mode !== 'supplementary') return false
+                        return true;
+                    })
+                    .map(d => d[d.length-1])
+                if (d.length === 0) return map
+                return {...map, [date]: d}
+            }, {})
+        resolve(result)
+    })
+}
+
 
 /**
  * @description 根據 range 找資料,不含deleted

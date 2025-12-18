@@ -2,18 +2,8 @@
  * @description 新增過磅紀錄
  */
 module.exports = function(context){
-    const {ScaleObserveController} = context.controller;
     const {Record, Scale, Config} = context.models;
     const {} = context.models;
-    let ERROR = null;
-    let DATA = null;
-    ScaleObserveController.regist("API-GET[/record]", (err) => {
-        ERROR = err;
-        DATA = null;
-    }, (data) => {
-        DATA = data;
-        ERROR = null;
-    })
     return [
         (req, res, next) => {
             // 貨物名稱
