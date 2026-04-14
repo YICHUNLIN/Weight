@@ -1,0 +1,232 @@
+const Jimp = require('jimp');
+const Tesseract = require('tesseract.js');
+const fs = require('fs');
+
+// --- 影像處理與基礎演算法區 (保持不變) ---
+
+function adaptiveThreshold(image, windowSize = 19, constantC = 8) {
+    const width = image.bitmap.width;
+    const height = image.bitmap.height;
+    const clone = image.clone();
+    image.scan(0, 0, width, height, function(x, y, idx) {
+        let sum = 0, count = 0;
+        const half = Math.floor(windowSize / 2);
+        // 優化：跳躍採樣以加速
+        for (let wy = -half; wy <= half; wy += 2) { 
+            for (let wx = -half; wx <= half; wx += 2) {
+                const nx = x + wx, ny = y + wy;
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                    sum += image.bitmap.data[image.getPixelIndex(nx, ny)];
+                    count++;
+                }
+            }
+        }
+        const mean = count > 0 ? sum / count : 0;
+        // 白字黑底
+        const binary = (this.bitmap.data[idx] < mean - constantC) ? 255 : 0;
+        clone.setPixelColor(Jimp.rgbaToInt(binary, binary, binary, 255), x, y);
+    });
+    return clone;
+}
+
+function findConnectedComponents(image) {
+    const width = image.bitmap.width;
+    const height = image.bitmap.height;
+    const visited = new Uint8Array(width * height);
+    const components = [];
+
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const idx = y * width + x;
+            if (image.bitmap.data[idx * 4] === 255 && visited[idx] === 0) {
+                let minX = x, maxX = x, minY = y, maxY = y, area = 0;
+                let q = [idx]; visited[idx] = 1;
+                while (q.length > 0) {
+                    const curr = q.shift();
+                    const cx = curr % width, cy = Math.floor(curr / width);
+                    area++;
+                    if (cx < minX) minX = cx; if (cx > maxX) maxX = cx;
+                    if (cy < minY) minY = cy; if (cy > maxY) maxY = cy;
+                    [[cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1]].forEach(([nx,ny]) => {
+                        if(nx>=0 && nx<width && ny>=0 && ny<height){
+                             let nIdx = ny*width+nx;
+                             if(visited[nIdx]===0 && image.bitmap.data[nIdx*4]===255){
+                                 visited[nIdx]=1; q.push(nIdx);
+                             }
+                        }
+                    });
+                }
+                components.push({ x: minX, y: minY, w: maxX-minX+1, h: maxY-minY+1, area, centerX: minX+(maxX-minX+1)/2, centerY: minY+(maxY-minY+1)/2 });
+            }
+        }
+    }
+    return components;
+}
+
+function dilate(image) {
+    const w = image.bitmap.width, h = image.bitmap.height;
+    const clone = image.clone();
+    image.scan(0,0,w,h,function(x,y,idx){
+        if(this.bitmap.data[idx]===255){
+            [[x+1,y],[x-1,y],[x,y+1],[x,y-1]].forEach(([nx,ny])=>{
+                if(nx>=0 && nx<w && ny>=0 && ny<h) clone.setPixelColor(0xFFFFFFFF, nx, ny);
+            });
+        }
+    });
+    return clone;
+}
+
+function drawRect(image, x, y, w, h, hexColor) {
+    const color = Jimp.cssColorToHex(hexColor);
+    for(let i=0; i<w; i++) { image.setPixelColor(color, x+i, y); image.setPixelColor(color, x+i, y+h-1); }
+    for(let i=0; i<h; i++) { image.setPixelColor(color, x, y+i); image.setPixelColor(color, x+w-1, y+i); }
+}
+
+// --- 【核心新增】智慧篩選輔助函式 ---
+
+/**
+ * 判斷兩個區塊是否為「鄰居」
+ * 條件：高度相似、Y軸對齊、水平距離適中
+ */
+function areNeighbors(c1, c2) {
+    // 1. 高度差異不能太大 (例如不超過 30%)
+    const heightDiffRatio = Math.abs(c1.h - c2.h) / Math.max(c1.h, c2.h);
+    if (heightDiffRatio > 0.3) return false;
+
+    // 2. Y軸中心點要接近 (在同一水平線上)
+    const yDiffRatio = Math.abs(c1.centerY - c2.centerY) / Math.max(c1.h, c2.h);
+    if (yDiffRatio > 0.4) return false;
+
+    // 3. 水平距離 (c2 在 c1 右邊，且距離不能太遠)
+    const distance = c2.x - (c1.x + c1.w);
+    // 距離要是正的 (在右邊)，且不超過 2 個字寬 (避免跨越太大空隙)
+    // 允許一點點重疊 (distance > -這定值)
+    if (distance < -(c1.w * 0.2) || distance > c1.w * 2.5) return false;
+
+    return true;
+}
+
+
+// --- 主流程 ---
+
+async function processLicensePlate(fileName) {
+    console.log(`\n=== [最終強力去噪版] 處理: ${fileName} ===`);
+    
+    try {
+        const original = await Jimp.read(fileName);
+        const imgH = original.bitmap.height;
+
+        // 1. 前處理 (保持不變)
+        const processed = original.clone().greyscale();
+        processed.convolute([[0, -1, 0], [-1, 5, -1], [0, -1, 0]]); 
+        // 這裡 windowSize 加大到 25，對於大面積光影變化適應性更好
+        let binary = adaptiveThreshold(processed, 25, 8); 
+        binary = dilate(binary);
+        await binary.writeAsync(`debug_binary_final_${fileName}`);
+
+        // 2. 尋找所有白色區塊
+        let components = findConnectedComponents(binary);
+        console.log(`   初始找到 ${components.length} 個白色區塊。`);
+
+        // --- 【核心修改】智慧篩選與分組 ---
+
+        // 3.1 初步幾何篩選 (濾掉太誇張的雜訊)
+        let candidates = components.filter(c => {
+            const aspect = c.w / c.h;
+            // 高度至少要佔畫面 20%，寬高比要像文字 (0.15 ~ 1.5)
+            return c.h > imgH * 0.2 && aspect > 0.15 && aspect < 1.5 && c.area > 100;
+        });
+        // 務必從左到右排序
+        candidates.sort((a, b) => a.x - b.x);
+        console.log(`   初步幾何篩選後剩 ${candidates.length} 個候選區塊。`);
+
+        // 3.2 分組演算法 (尋找文字鏈)
+        let groups = [];
+        let visited = new Set();
+
+        for (let i = 0; i < candidates.length; i++) {
+            if (visited.has(i)) continue;
+
+            let currentGroup = [candidates[i]];
+            visited.add(i);
+            let lastChar = candidates[i];
+
+            // 往右尋找鄰居
+            for (let j = i + 1; j < candidates.length; j++) {
+                if (visited.has(j)) continue;
+                let nextChar = candidates[j];
+
+                if (areNeighbors(lastChar, nextChar)) {
+                    currentGroup.push(nextChar);
+                    visited.add(j);
+                    lastChar = nextChar; // 更新參考點為最右邊的字
+                }
+            }
+            // 只有當鏈條長度大於等於 3 才算是一個有效群組 (過濾孤點)
+            if (currentGroup.length >= 3) {
+                groups.push(currentGroup);
+            }
+        }
+
+        console.log(`   找到 ${groups.length} 個潛在文字鏈群組。`);
+
+        // 3.3 挑選最佳群組 (假設最長的鏈條就是車牌)
+        let bestGroup = [];
+        if (groups.length > 0) {
+            // 依群組長度排序 (長的在前)
+            groups.sort((a, b) => b.length - a.length);
+            bestGroup = groups[0]; // 取第一名
+            console.log(` -> 選定最佳群組，包含 ${bestGroup.length} 個字元。`);
+        } else {
+            console.log(" -> 警告：未找到符合排列規則的文字群組，可能雜訊過多或前處理失敗。");
+        }
+        
+        // 4. 逐字 OCR (只針對最佳群組)
+        let finalPlateText = "";
+        const finalOutputImg = original.clone();
+        
+        // 畫出 debug 用的所有候選框 (紅色 - 被演算法淘汰的)
+        candidates.forEach(c => drawRect(finalOutputImg, c.x, c.y, c.w, c.h, '#FF0000'));
+
+        for (let i = 0; i < bestGroup.length; i++) {
+            const comp = bestGroup[i];
+            
+            // 從二值化圖切圖，反轉為白底黑字
+            const charImg = binary.clone().crop(comp.x, comp.y, comp.w, comp.h).invert();
+
+            // 加 Padding
+            const pad = 20;
+            const paddedChar = await new Jimp(comp.w + pad*2, comp.h + pad*2, 0xFFFFFFFF);
+            paddedChar.composite(charImg, pad, pad);
+            
+            const charBuffer = await paddedChar.getBufferAsync(Jimp.MIME_PNG);
+            
+            const { data } = await Tesseract.recognize(charBuffer, 'eng', {
+                tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', // 移除橫線，只認英數
+                tessedit_pageseg_mode: '10' // Single Character
+            });
+
+            const charResult = data.text.trim();
+            // 降低信心度門檻，因為經過嚴格篩選，留下來的通常就是字
+            if (charResult && data.confidence > 30) {
+                finalPlateText += charResult;
+                // 畫出最終選定的框 (綠色 - 成功辨識)
+                drawRect(finalOutputImg, comp.x, comp.y, comp.w, comp.h, '#00FF00');
+            }
+        }
+
+        console.log(`\n★ 最終辨識結果: ${finalPlateText}`);
+        await finalOutputImg.writeAsync(`result_final_${fileName}`);
+        console.log(`★ 結果圖 (紅框=雜訊, 綠框=車牌): result_final_${fileName}`);
+
+    } catch (err) {
+        console.error("發生錯誤:", err);
+    }
+}
+
+const files = ['image_0.png', 'image_1.png'];
+(async () => {
+    for (const f of files) {
+        if (fs.existsSync(f)) await processLicensePlate(f);
+    }
+})();

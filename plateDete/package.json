@@ -1,0 +1,17 @@
+{
+  "name": "platedete",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cli-progress": "^3.12.0",
+    "jimp": "^0.22.12",
+    "tesseract.js": "^7.0.0"
+  }
+}
